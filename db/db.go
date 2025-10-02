@@ -23,6 +23,7 @@ func Init() *gorm.DB {
 		&models.User{},
 		&models.Role{},
 		&models.Session{},
+		&models.Tracks{},
 	)
 	if err != nil {
 		fmt.Println("Error")	

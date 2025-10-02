@@ -16,9 +16,9 @@ import (
 	"encoding/base64"
 	"gopkg.in/gomail.v2"
 	"crypto/tls"
-	_"io"
-	_"os"
-	_"path/filepath"
+	"io"
+	"os"
+	"path/filepath"
 	_"github.com/go-chi/chi/v5"
 	_"strconv"
 	_"strings"
@@ -60,7 +60,12 @@ type ForgotUser struct {
 
 //index
 func (h *Handler) HomeHandler(w http.ResponseWriter, r *http.Request) {
-	rend.HTML(w, http.StatusOK, "indexPage", nil)
+	var tracks []models.Tracks
+	h.DB.Find(&tracks)
+	data := map[string]interface{}{
+		"AllTracks": tracks,
+	}
+	rend.HTML(w, http.StatusOK, "indexPage", data)
 }
 
 
@@ -70,7 +75,84 @@ func(h *Handler) AdminDashHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) AdminCreateHandler(w http.ResponseWriter, r *http.Request) {
-	rend.HTML(w, http.StatusOK, "adminCreatePage",nil)
+	uri := r.URL.Path
+	if uri == "/admin/create" {
+		if r.Method == http.MethodPost {
+			trackTitle := r.FormValue("track_title")
+			artistName := r.FormValue("artist_name")
+			trackCode := r.FormValue("track_code")
+			genre := r.FormValue("genre")
+			featured := r.FormValue("is_featured")
+			trackIcon, trackIconHandler, err := r.FormFile("track_icon")
+			trackFile,handler,err := r.FormFile("track_file")
+			fmt.Println(trackTitle, artistName, trackCode, genre, featured)
+			if err != nil {
+				fmt.Println("Failed to read file content")
+			}
+			if trackFile != nil {
+				fmt.Println(handler.Filename)
+
+				defer trackFile.Close()
+				dst, err := os.Create(filepath.Join(uploadPath, handler.Filename))
+				if err != nil {
+					fmt.Println("Failed to create file path")
+				}
+				defer dst.Close()
+				if _, err := io.Copy(dst, trackFile); err != nil {
+					fmt.Println("Failed to copy audio track to destination!")
+				}
+				fmt.Println("File uploaded successfully")
+				trackPath := "media/" + handler.Filename
+
+				//check image
+				var icon string
+				if trackIcon != nil {
+					defer trackIcon.Close()
+					imgDst, err := os.Create(filepath.Join(uploadPath, trackIconHandler.Filename))
+					if err != nil {
+						fmt.Println("Failed to create icon file path!")
+					}
+					defer imgDst.Close()
+					if _, err := io.Copy(imgDst, trackIcon); err != nil {
+						fmt.Println("Failed to copy icon to destination!")
+					}
+					icon = trackIconHandler.Filename
+					fmt.Println("Icon uploaded successfully")
+				}else{
+					icon = ""
+				}
+
+				var featuredBool bool
+				if featured == "on" {
+					featuredBool = true
+				}else{
+					featuredBool = false
+				}
+				//store audio file data in db
+				track := models.Tracks{
+					TrackTitle: trackTitle,
+					ArtistName: artistName,
+					TrackCode: trackCode,
+					Genre: genre,
+					TrackPath: trackPath,
+					Featured: featuredBool,
+					TrackAvatar: icon,
+				}
+				if err := h.DB.Create(&track).Error; err != nil {
+					fmt.Println("Failed to create track record!")
+				}
+			}
+		}
+	}
+
+	//view tracks
+	var tracks []models.Tracks
+	h.DB.Find(&tracks)
+	data := map[string]interface{}{
+		"AllTracks": tracks,
+	}
+
+	rend.HTML(w, http.StatusOK, "adminCreatePage",data)
 }
 
 

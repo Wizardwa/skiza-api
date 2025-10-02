@@ -49,6 +49,7 @@ func Routes(db *gorm.DB, SessionManager *scs.SessionManager) http.Handler {
 		router.Use(auth.CheckUserRole(SessionManager, 1))
 		router.Get("/admin", h.AdminDashHandler)
 		router.Get("/admin/create", h.AdminCreateHandler)
+		router.Post("/admin/create", h.AdminCreateHandler)
 	})
 
 

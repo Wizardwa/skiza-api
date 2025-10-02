@@ -1,314 +1,483 @@
 {{define "indexPage"}}
 <!DOCTYPE html>
-<html lang="en"> 
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CallSign - The Ultimate Collection</title>
+    <title>Lamahuraancomm | Discover Top Skiza Tunes</title>
     
+    <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
-        /* --- THEME & COLOR VARIABLES --- */
+        /* --- MASTER THEME VARIABLES --- */
         :root {
-            --primary-glow: #7c3aed;
-            --secondary-glow: #0ea5e9;
-            /* Default to Dark Mode */
+            --font-main: 'Inter', sans-serif;
+            --primary-glow: #8b5cf6; /* Violet */
+            --secondary-glow: #06b6d4; /* Cyan */
+            
+            /* Dark Mode (Default) */
             --bg-main: #0F0F1B;
-            --bg-card: rgba(26, 26, 39, 0.6);
-            --bg-control: rgba(26, 26, 39, 0.8);
+            --bg-card: rgba(30, 30, 45, 0.5);
+            --bg-control: rgba(255, 255, 255, 0.05);
+            --border-color: rgba(255, 255, 255, 0.08);
             --text-primary: #f8fafc;
-            --text-secondary: #a1a1aa;
-            --border-color: rgba(255, 255, 255, 0.1);
-            --shadow-color: rgba(0,0,0,0.2);
-            --bg-animated: radial-gradient(circle at 1% 1%, var(--primary-glow), transparent 30%),
-                           radial-gradient(circle at 99% 99%, var(--secondary-glow), transparent 35%);
+            --text-secondary: #94a3b8;
+            --shadow-soft: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            
+            --bg-animated: radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
+                           radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 40%),
+                           linear-gradient(135deg, #0F0F1B 0%, #1a1a2e 100%);
         }
 
         [data-theme="light"] {
-            --bg-main: #f4f4f9;
+            --bg-main: #f8fafc;
             --bg-card: rgba(255, 255, 255, 0.6);
-            --bg-control: #ffffff;
-            --text-primary: #111827;
-            --text-secondary: #6b7280;
-            --border-color: rgba(0, 0, 0, 0.1);
-            --shadow-color: rgba(0,0,0,0.1);
-            --bg-animated: radial-gradient(circle at 1% 1%, #d8b4fe, transparent 35%),
-                           radial-gradient(circle at 99% 99%, #bae6fd, transparent 40%);
+            --bg-control: rgba(0, 0, 0, 0.03);
+            --border-color: rgba(0, 0, 0, 0.06);
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --shadow-soft: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            
+            --bg-animated: radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                           radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.1) 0%, transparent 50%),
+                           linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        @keyframes backgroundPan {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        html { scroll-behavior: smooth; }
-
+        /* --- Base Styles & Animations --- */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-main);
+            font-family: var(--font-main);
+            background: var(--bg-animated);
+            background-attachment: fixed; /* Keeps bg steady while scrolling */
             color: var(--text-primary);
-            background-image: var(--bg-animated);
-            background-size: 300% 300%;
-            animation: backgroundPan 25s ease infinite;
+            transition: color 0.3s ease, background 0.3s ease;
+            min-height: 100vh; display: flex; flex-direction: column;
             overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            transition: background-color 0.4s ease, color 0.4s ease;
         }
 
-        .container { 
-            max-width: 1200px; 
-            width: 100%;
-            margin: 0 auto; 
-            padding: 40px 24px;
-            flex-grow: 1;
-        }
-        
-        .header-controls { display: flex; justify-content: flex-end; margin-bottom: 20px; }
-        .theme-toggle { background: var(--bg-card); border: 1px solid var(--border-color); width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
-        .theme-toggle:hover { border-color: var(--primary-glow); }
-        .theme-toggle .icon { font-size: 1.2rem; color: var(--text-secondary); }
-        .moon-icon { display: none; }
-        .sun-icon { display: none; }
-        [data-theme="dark"] .moon-icon { display: block; }
-        [data-theme="light"] .sun-icon { display: block; }
-
-        .section-header { text-align: center; margin-bottom: 50px; }
-        .section-header h2 { font-size: 2.8rem; font-weight: 900; background: linear-gradient(90deg, var(--text-primary), var(--text-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; animation: fadeInDown 1s ease-out; }
-        .section-header p { font-size: 1.1rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto; animation: fadeInUp 1s ease-out 0.2s forwards; }
-        
-        .callsign-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-bottom: 80px; }
-
-        @keyframes cardFadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .callsign-item {
-            position: relative; 
+        .glass {
             background: var(--bg-card);
-            border: 1px solid var(--border-color); 
-            border-radius: 16px;
-            padding: 24px; 
-            backdrop-filter: blur(12px);
-            overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.4s ease, border-color 0.4s ease;
-            display: none; 
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-soft);
         }
 
-        .callsign-item:hover { transform: translateY(-8px); box-shadow: 0 20px 40px var(--shadow-color), 0 0 30px var(--primary-glow); border-color: rgba(124, 58, 237, 0.5); }
-        .callsign-item::before { content: ''; position: absolute; top: 0; left: -150%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent); transform: skewX(-30deg); transition: left 0.7s ease; }
-        [data-theme="light"] .callsign-item::before { background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.05), transparent); }
-        .callsign-item:hover::before { left: 150%; }
-        .callsign-item .info { display: flex; flex-direction: column; justify-content: space-between; height: 100%; }
-        .callsign-item .info h3 { font-size: 1.5rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-        .quote-preview {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 24px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
+        .logo-text {
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary-glow), var(--secondary-glow));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-        .callsign-item .actions { display: flex; gap: 10px; margin-top: auto; flex-wrap: wrap; }
-        .callsign-btn { background-color: transparent; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 16px; font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s ease; text-decoration: none; backdrop-filter: blur(5px); }
-        .callsign-btn:hover { color: var(--text-primary); border-color: var(--secondary-glow); background-color: rgba(14, 165, 233, 0.1); }
-        .btn-primary { background-color: var(--primary-glow); border-color: var(--primary-glow); color: #fff; }
-        .btn-primary:hover { background-color: #6d28d9; border-color: #6d28d9; box-shadow: 0 0 15px rgba(124, 58, 237, 0.7); }
 
-        .pagination-controls { display: flex; justify-content: center; align-items: center; gap: 8px; user-select: none; flex-wrap: wrap; }
-        .pagination-btn, .page-number { background: var(--bg-control); border: 1px solid var(--border-color); color: var(--text-secondary); border-radius: 8px; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.2s ease; }
-        .pagination-btn:hover, .page-number:hover { color: var(--text-primary); border-color: var(--secondary-glow); }
-        .page-number.active { color: #fff; background: var(--primary-glow); border-color: var(--primary-glow); font-weight: 700; cursor: default; }
-        .pagination-btn.disabled { opacity: 0.5; pointer-events: none; }
-        .page-ellipsis { color: var(--text-secondary); width: 20px; text-align: center; }
-        
-        .modal-overlay { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(10, 10, 20, 0.8); backdrop-filter: blur(8px); align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; }
-        [data-theme="light"] .modal-overlay { background-color: rgba(255, 255, 255, 0.8); }
-        .modal-overlay.show { display: flex; opacity: 1; }
-        .modal-content { background: var(--bg-card); border: 1px solid var(--border-color); padding: 40px; border-radius: 16px; width: 90%; max-width: 500px; text-align: center; position: relative; box-shadow: 0 25px 50px -12px var(--shadow-color); transform: scale(0.95); transition: transform 0.3s ease; }
-        .modal-overlay.show .modal-content { transform: scale(1); }
-        .modal-close-btn { color: var(--text-secondary); position: absolute; top: 15px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer; transition: color 0.2s, transform 0.2s; }
-        .modal-close-btn:hover { color: var(--text-primary); transform: rotate(90deg); }
-        #modalQuoteText { font-size: 1.5rem; line-height: 1.6; font-weight: 500; color: var(--text-primary); background: linear-gradient(90deg, var(--primary-glow), var(--secondary-glow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        [data-theme="light"] #modalQuoteText { background: linear-gradient(90deg, #6d28d9, #0284c7); -webkit-background-clip: text; }
-        
-        .site-footer { text-align: center; padding: 40px 20px; margin-top: auto; color: var(--text-secondary); font-size: 0.9rem; transition: color 0.4s ease; }
+        /* --- Sonic Card Styles --- */
+        .track-card {
+            border-radius: 16px; overflow: hidden;
+            transition: transform 0.1s ease-out, box-shadow 0.3s ease; /* Smooth tilt, standard hover shadow */
+            transform-style: preserve-3d;
+        }
+        /* The tilt effect is handled by JS, but we add a subtle lift on hover */
+        .track-card:hover { box-shadow: 0 15px 40px -10px rgba(139, 92, 246, 0.3); }
 
-        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .cover-art-wrapper {
+            position: relative; aspect-ratio: 1 / 1; overflow: hidden;
+            background: linear-gradient(45deg, #3b205d, #1d0f2b);
+        }
+        [data-theme="light"] .cover-art-wrapper { background: linear-gradient(45deg, #e0e7ff, #f3e8ff); }
 
-        @media (max-width: 992px) { .callsign-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 768px) { .container { padding: 20px 16px; } .section-header h2 { font-size: 2.2rem; } .section-header p { font-size: 1rem; } .callsign-grid { grid-template-columns: 1fr; } }
+        /* Play Overlay */
+        .play-overlay {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.3);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s ease; cursor: pointer;
+        }
+        .track-card:hover .play-overlay, .track-card.playing .play-overlay { opacity: 1; }
+        .play-btn {
+            width: 56px; height: 56px; border-radius: 50%;
+            background: var(--primary-glow); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 32px; box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .play-overlay:hover .play-btn { transform: scale(1.15); }
+        .track-card.playing .cover-art-wrapper img { transform: scale(1.1); } /* Pulse effect if using real images */
+
+        /* Live Visualizer (CSS Animation) */
+        .visualizer { display: flex; align-items: flex-end; gap: 2px; height: 16px; margin-left: 8px; opacity: 0; }
+        .track-card.playing .visualizer { opacity: 1; }
+        .bar { width: 3px; background: var(--secondary-glow); border-radius: 2px; animation: equalize 0.8s infinite alternate; }
+        .bar:nth-child(1) { height: 60%; animation-delay: -0.4s; }
+        .bar:nth-child(2) { height: 100%; animation-delay: -0.2s; }
+        .bar:nth-child(3) { height: 80%; animation-delay: 0s; }
+        @keyframes equalize { 0% { height: 20%; } 100% { height: 100%; } }
+
+        /* Skiza Code Badge */
+        .skiza-badge {
+            background: var(--bg-control); border: 1px solid var(--border-color);
+            font-family: 'Courier New', monospace; letter-spacing: 1px;
+        }
+
+        /* Search & Filter Inputs */
+        .search-input {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            color: var(--text-primary); backdrop-filter: blur(10px);
+        }
+        .search-input:focus { outline: none; border-color: var(--primary-glow); box-shadow: 0 0 15px -3px var(--primary-glow); }
+        .filter-chip {
+            background: var(--bg-control); color: var(--text-secondary);
+            border: 1px solid transparent; cursor: pointer; transition: all 0.3s;
+        }
+        .filter-chip:hover, .filter-chip.active {
+            background: rgba(139, 92, 246, 0.15); color: var(--primary-glow);
+            border-color: var(--primary-glow);
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="header-controls">
-            <div class="theme-toggle" id="theme-toggle" title="Toggle Theme">
-                <i class="fas fa-moon icon moon-icon"></i>
-                <i class="fas fa-sun icon sun-icon"></i>
+    <!-- Navbar -->
+    <nav class="w-full px-6 py-4 flex justify-between items-center z-50 glass sticky top-0">
+        <div class="flex items-center gap-2">
+            <i class='bx bxs-music text-3xl text-violet-500 animate-pulse'></i>
+            <span class="text-2xl logo-text">Lamahuraancomm</span>
+        </div>
+        <div class="flex items-center gap-6">
+            <a href="/login" class="text-sm font-medium text-var(--text-secondary) hover:text-var(--primary-glow) transition-colors hidden md:block">Login</a>
+            <!-- Theme Toggle -->
+            <button id="theme-toggle" class="w-10 h-10 rounded-full bg-control border border-color flex items-center justify-center text-var(--text-secondary) hover:text-var(--primary-glow) transition-all">
+                <i class='bx bxs-moon text-xl dark-icon hidden'></i>
+                <i class='bx bxs-sun text-xl light-icon'></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero & Search Section -->
+    <header class="relative pt-20 pb-16 px-4 text-center max-w-5xl mx-auto">
+        <h1 class="text-5xl md:text-7xl font-black mb-6 bg-clip-text text-transparent bg-gradient-to-r from-slate-100 to-slate-400 dark:from-white dark:to-slate-400" style="color: var(--text-primary);">
+            Find Your Sound.
+        </h1>
+        <p class="text-xl text-var(--text-secondary) mb-10 max-w-2xl mx-auto leading-relaxed" style="color: var(--text-secondary);">
+            Browse the ultimate collection of Skiza tunes. Set the rhythm that defines you.
+        </p>
+        
+        <!-- Search and Filters -->
+        <div class="flex flex-col items-center gap-6 w-full max-w-3xl mx-auto">
+            <!-- Search Bar -->
+            <div class="relative w-full group">
+                <i class='bx bx-search absolute left-4 top-1/2 transform -translate-y-1/2 text-2xl text-gray-400 group-focus-within:text-violet-500 transition-colors'></i>
+                <input type="text" id="searchInput" placeholder="Search by song, artist, or code..." 
+                       class="search-input w-full py-4 pl-14 pr-6 rounded-2xl text-lg shadow-lg">
+            </div>
+            <!-- Genre Chips -->
+            <div class="flex flex-wrap justify-center gap-3" id="genreFilters">
+                <button class="filter-chip active px-5 py-2 rounded-full font-medium text-sm" data-genre="all">All</button>
+                <button class="filter-chip px-5 py-2 rounded-full font-medium text-sm" data-genre="gospel">Gospel</button>
+                <button class="filter-chip px-5 py-2 rounded-full font-medium text-sm" data-genre="bongo">Bongo</button>
+                <button class="filter-chip px-5 py-2 rounded-full font-medium text-sm" data-genre="afrobeat">Afrobeat</button>
+                <button class="filter-chip px-5 py-2 rounded-full font-medium text-sm" data-genre="reggea">Reggae</button>
             </div>
         </div>
+    </header>
 
-        <section id="top-callsigns">
-            <div class="section-header">
-                <h2>Explore The Collection</h2>
-                <p>Discover and equip the most iconic CallSigns. Each one tells a story.</p>
-            </div>
+    <!-- Main Track Grid -->
+    <main class="container mx-auto px-4 pb-24 flex-grow">
+        <div id="trackGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             
-            <div class="callsign-grid">
-                {{range .callsignData}}
-                <div class="callsign-item">
-                    <div class="info">
-                        <div>
-                            <h3>{{.Type}}</h3>
-                            <p class="quote-preview">{{.Quote}}</p>
-                        </div>
-                        <div class="actions">
-                            <button class="callsign-btn preview-btn" data-quote="{{.Quote}}">
-                                Preview
-                            </button>
-                            <a href="/set-callsign/{{.ID}}" class="callsign-btn btn-primary">
-                                <i class="fa-solid fa-star"></i> Subscribe
-                            </a>
+            <!-- 
+              GO TEMPLATE NOTE: 
+              Replace the dummy data below with your loop.
+              Ensure your backend provides: Title, Artist, Genre, SkizaCode, and optionally AudioURL/CoverURL.
+            -->
+
+            <!-- Example Sonic Card 1 (Playing State Demo) -->
+            {{range .AllTracks}}
+            <div class="track-card glass p-5 tilt-element" data-genre="afrobeat" data-search="city boys burna boy">
+                <!-- Cover Art & Play -->
+                <div class="cover-art-wrapper rounded-xl mb-5">
+                    <!-- Replace with <img src="{{.TrackAvatar}}"> if you have real art -->
+                    <div class="w-full h-full flex items-center justify-center">
+                        <!-- <i class='bx bxs-music text-6xl text-white opacity-20'></i -->
+                        {{if .TrackAvatar}}
+                        <img src="/media/{{.TrackAvatar}}">
+                        {{else}}
+                         <i class='bx bxs-music text-6xl text-white opacity-20'></i>   
+                        {{end}}
+                    </div>
+                    
+                    <!-- Audio Element (Hidden) -->
+                    <audio class="track-audio" src="/{{.TrackPath}}" preload="none"></audio>
+
+                    <div class="play-overlay" onclick="togglePlay(this.closest('.track-card'))">
+                        <div class="play-btn">
+                            <i class='bx bx-play pl-1 play-icon'></i>
+                            <i class='bx bx-pause pause-icon hidden'></i>
                         </div>
                     </div>
                 </div>
-                {{end}}
+
+                <!-- Info -->
+                <div class="mb-4">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-bold uppercase tracking-wider text-cyan-500">{{.Genre}}</span>
+                        <!-- Visualizer (Appears when playing) -->
+                        <div class="visualizer">
+                            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold truncate" style="color: var(--text-primary);">{{.TrackTitle}}</h3>
+                    <p class="text-sm truncate" style="color: var(--text-secondary);">{{.ArtistName}}</p>
+                </div>
+
+                <!-- Action Area -->
+                <div class="flex items-center justify-between pt-4 border-t border-color">
+                    <!-- <div class="skiza-badge px-3 py-1.5 rounded-lg text-sm font-bold" style="color: var(--text-primary);">
+                        #<span class="select-all">812001</span>
+                    </div> -->
+                    <button class="bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 text-white p-2 rounded-full shadow-lg transition-all hover:scale-110 hover:shadow-violet-500/50" title="Subscribe Info">
+                        <i class='bx bx-dialpad-alt text-xl'></i>
+                    </button>
+                </div>
+            </div>
+            {{end}}
+
+            <!-- Example Sonic Card 2 -->
+            <!-- <div class="track-card glass p-5 tilt-element" data-genre="gospel" data-search="imenibamba evelyn wanjiru">
+                <div class="cover-art-wrapper rounded-xl mb-5" style="background: linear-gradient(135deg, #f59e0b, #ea580c);">
+                    <div class="w-full h-full flex items-center justify-center"><i class='bx bxs-church text-6xl text-white opacity-20'></i></div>
+                    <audio class="track-audio" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" preload="none"></audio>
+                    <div class="play-overlay" onclick="togglePlay(this.closest('.track-card'))">
+                        <div class="play-btn"><i class='bx bx-play pl-1 play-icon'></i><i class='bx bx-pause pause-icon hidden'></i></div>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-500">Gospel</span>
+                        <div class="visualizer"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+                    </div>
+                    <h3 class="text-xl font-bold truncate" style="color: var(--text-primary);">Imenibamba</h3>
+                    <p class="text-sm truncate" style="color: var(--text-secondary);">Evelyn Wanjiru</p>
+                </div>
+                <div class="flex items-center justify-between pt-4 border-t border-color">
+                    <div class="skiza-badge px-3 py-1.5 rounded-lg text-sm font-bold" style="color: var(--text-primary);">#<span class="select-all">705542</span></div>
+                    <button class="bg-gradient-to-r from-violet-600 to-cyan-600 text-white p-2 rounded-full shadow-lg transition-all hover:scale-110 hover:shadow-violet-500/50"><i class='bx bx-dialpad-alt text-xl'></i></button>
+                </div>
             </div>
 
-            <div class="pagination-controls" id="pagination-controls">
-                <div class="pagination-btn" id="first-btn"><i class="fa-solid fa-angles-left"></i></div>
-                <div class="pagination-btn" id="prev-btn"><i class="fa-solid fa-chevron-left"></i></div>
-                <div id="page-numbers" class="pagination-controls"></div>
-                <div class="pagination-btn" id="next-btn"><i class="fa-solid fa-chevron-right"></i></div>
-                <div class="pagination-btn" id="last-btn"><i class="fa-solid fa-angles-right"></i></div>
-            </div>
-        </section>
-    </div>
+            Example Sonic Card 3 (Featured) 
+            <div class="track-card glass p-5 tilt-element ring-1 ring-violet-500/50" data-genre="bongo" data-search="yatapita diamond platnumz">
+                 Featured Tag 
+                <div class="absolute top-0 right-5">
+                    <div class="bg-violet-600 text-white text-xs font-bold px-3 py-1 rounded-b-lg shadow-lg">Featured</div>
+                </div>
+                <div class="cover-art-wrapper rounded-xl mb-5" style="background: linear-gradient(135deg, #ec4899, #8b5cf6);">
+                    <div class="w-full h-full flex items-center justify-center"><i class='bx bxs-hot text-6xl text-white opacity-20'></i></div>
+                    <audio class="track-audio" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" preload="none"></audio>
+                    <div class="play-overlay" onclick="togglePlay(this.closest('.track-card'))">
+                        <div class="play-btn"><i class='bx bx-play pl-1 play-icon'></i><i class='bx bx-pause pause-icon hidden'></i></div>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-bold uppercase tracking-wider text-pink-500">Bongo</span>
+                        <div class="visualizer"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+                    </div>
+                    <h3 class="text-xl font-bold truncate" style="color: var(--text-primary);">Yatapita</h3>
+                    <p class="text-sm truncate" style="color: var(--text-secondary);">Diamond Platnumz</p>
+                </div>
+                <div class="flex items-center justify-between pt-4 border-t border-color">
+                    <div class="skiza-badge px-3 py-1.5 rounded-lg text-sm font-bold" style="color: var(--text-primary);">#<span class="select-all">909101</span></div>
+                    <button class="bg-gradient-to-r from-violet-600 to-cyan-600 text-white p-2 rounded-full shadow-lg transition-all hover:scale-110 hover:shadow-violet-500/50"><i class='bx bx-dialpad-alt text-xl'></i></button>
+                </div>
+            </div> -->
+            <!-- END GO TEMPLATE RANGE -->
 
-    <footer class="site-footer">
-        <p>&copy; 2023 Lamahuraan. All Rights Reserved.</p>
+        </div>
+
+        <!-- Minimal Pagination (Optional) -->
+        <div class="flex justify-center mt-16 gap-4">
+            <button class="glass px-6 py-3 rounded-full text-var(--text-secondary) hover:text-var(--primary-glow) hover:border-violet-500 transition-all flex items-center gap-2 disabled:opacity-50 cursor-pointer">
+                <i class='bx bx-left-arrow-alt text-xl'></i> Previous
+            </button>
+            <button class="glass px-6 py-3 rounded-full text-var(--text-secondary) hover:text-var(--primary-glow) hover:border-violet-500 transition-all flex items-center gap-2 cursor-pointer">
+                Next <i class='bx bx-right-arrow-alt text-xl'></i>
+            </button>
+        </div>
+    </main>
+
+    <footer class="glass border-t border-color py-8 text-center text-sm" style="color: var(--text-secondary);">
+        <div class="container mx-auto">
+            <p>&copy; 2024 Lamahuraancomm. The heartbeat of Skiza.</p>
+        </div>
     </footer>
 
-    <div id="previewModal" class="modal-overlay">
-        <div class="modal-content">
-            <span class="modal-close-btn">&times;</span>
-            <p id="modalQuoteText"></p>
-        </div>
-    </div>
-    
+    <!-- INTERACTIVITY SCRIPTS -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // --- THEME SWITCHER LOGIC ---
-            const themeToggle = document.getElementById('theme-toggle');
-            const docElement = document.documentElement;
-            const applyTheme = (theme) => {
-                docElement.setAttribute('data-theme', theme);
-                localStorage.setItem('theme', theme);
-            };
-            themeToggle.addEventListener('click', () => {
-                const currentTheme = docElement.getAttribute('data-theme');
-                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                applyTheme(newTheme);
-            });
-            const savedTheme = localStorage.getItem('theme');
-            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            if (savedTheme) { applyTheme(savedTheme); } 
-            else if (prefersDark) { applyTheme('dark'); } 
-            else { applyTheme('light'); }
-
-            // --- PAGINATION LOGIC ---
-            const itemsPerPage = 9;
-            const allItems = Array.from(document.querySelectorAll('.callsign-item'));
-            const totalPages = Math.ceil(allItems.length / itemsPerPage);
-            let currentPage = 1;
-            const pageNumbersContainer = document.getElementById('page-numbers');
-            const firstBtn = document.getElementById('first-btn');
-            const prevBtn = document.getElementById('prev-btn');
-            const nextBtn = document.getElementById('next-btn');
-            const lastBtn = document.getElementById('last-btn');
             
-            function displayPage(page) {
-                if (page < 1 || page > totalPages) return;
-                currentPage = page;
-                const startIndex = (page - 1) * itemsPerPage;
-                const endIndex = startIndex + itemsPerPage;
-                
-                allItems.forEach(item => item.style.display = 'none');
-                const pageItems = allItems.slice(startIndex, endIndex);
-                pageItems.forEach((item, index) => {
-                    item.style.display = 'flex';
-                    item.style.animation = 'none';
-                    void item.offsetWidth; 
-                    item.style.animation = `cardFadeIn 0.5s ease-out ${index * 0.1}s forwards`;
-                });
-                updatePaginationControls();
-            }
+            // 1. THEME TOGGLE LOGIC
+            const themeToggle = document.getElementById('theme-toggle');
+            const html = document.documentElement;
+            const lightIcon = themeToggle.querySelector('.light-icon');
+            const darkIcon = themeToggle.querySelector('.dark-icon');
 
-            function createPageElement(type, value) {
-                if (type === 'ellipsis') {
-                    const ellipsis = document.createElement('span');
-                    ellipsis.className = 'page-ellipsis';
-                    ellipsis.textContent = '...';
-                    return ellipsis;
-                }
-                const pageBtn = document.createElement('div');
-                pageBtn.className = 'page-number';
-                pageBtn.textContent = value;
-                if (value === currentPage) pageBtn.classList.add('active');
-                pageBtn.addEventListener('click', () => displayPage(value));
-                return pageBtn;
-            }
-
-            function updatePaginationControls() {
-                pageNumbersContainer.innerHTML = '';
-                const pageNeighbours = 1;
-                const totalNumbers = (pageNeighbours * 2) + 3;
-                const totalBlocks = totalNumbers + 2;
-                if (totalPages > totalBlocks) {
-                    const startPage = Math.max(2, currentPage - pageNeighbours);
-                    const endPage = Math.min(totalPages - 1, currentPage + pageNeighbours);
-                    pageNumbersContainer.appendChild(createPageElement('number', 1));
-                    if (startPage > 2) pageNumbersContainer.appendChild(createPageElement('ellipsis'));
-                    for (let i = startPage; i <= endPage; i++) pageNumbersContainer.appendChild(createPageElement('number', i));
-                    if (endPage < totalPages - 1) pageNumbersContainer.appendChild(createPageElement('ellipsis'));
-                    pageNumbersContainer.appendChild(createPageElement('number', totalPages));
+            function applyTheme(theme) {
+                html.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+                if (theme === 'dark') {
+                    lightIcon.classList.remove('hidden'); darkIcon.classList.add('hidden');
                 } else {
-                    for (let i = 1; i <= totalPages; i++) pageNumbersContainer.appendChild(createPageElement('number', i));
+                    lightIcon.classList.add('hidden'); darkIcon.classList.remove('hidden');
                 }
-                firstBtn.classList.toggle('disabled', currentPage === 1);
-                prevBtn.classList.toggle('disabled', currentPage === 1);
-                nextBtn.classList.toggle('disabled', currentPage === totalPages);
-                lastBtn.classList.toggle('disabled', currentPage === totalPages);
             }
 
-            firstBtn.addEventListener('click', () => displayPage(1));
-            prevBtn.addEventListener('click', () => displayPage(currentPage - 1));
-            nextBtn.addEventListener('click', () => displayPage(currentPage + 1));
-            lastBtn.addEventListener('click', () => displayPage(totalPages));
-            if (totalPages > 0) displayPage(1);
+            // Init theme
+            const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            applyTheme(savedTheme);
 
-            // --- Modal Logic ---
-            const modal = document.getElementById('previewModal');
-            const modalText = document.getElementById('modalQuoteText');
-            const closeBtn = document.querySelector('.modal-close-btn');
-            function openModal(quote) { modalText.textContent = quote; modal.classList.add('show'); }
-            function closeModal() { modal.classList.remove('show'); }
-            document.querySelectorAll('.preview-btn').forEach(button => { button.addEventListener('click', function() { openModal(this.dataset.quote); }); });
-            closeBtn.addEventListener('click', closeModal);
-            modal.addEventListener('click', function(event) { if (event.target === modal) { closeModal(); } });
+            themeToggle.addEventListener('click', () => {
+                const current = html.getAttribute('data-theme');
+                applyTheme(current === 'dark' ? 'light' : 'dark');
+            });
+
+            // 2. AUDIO PLAYER LOGIC (Single Source of Truth)
+            let currentAudio = null;
+            let currentCard = null;
+
+            window.togglePlay = function(card) {
+                const audio = card.querySelector('.track-audio');
+                const playIcon = card.querySelector('.play-icon');
+                const pauseIcon = card.querySelector('.pause-icon');
+
+                // If clicking a different track, stop the current one
+                if (currentAudio && currentAudio !== audio) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                    currentCard.classList.remove('playing');
+                    currentCard.querySelector('.play-icon').classList.remove('hidden');
+                    currentCard.querySelector('.pause-icon').classList.add('hidden');
+                }
+
+                if (audio.paused) {
+                    // Play this track
+                    // Note: In production, ensure AudioURL is valid.
+                    audio.volume = 0.5; // Start not too loud
+                    const playPromise = audio.play();
+                    
+                    if (playPromise !== undefined) {
+                        playPromise.then(_ => {
+                            card.classList.add('playing');
+                            playIcon.classList.add('hidden');
+                            pauseIcon.classList.remove('hidden');
+                            currentAudio = audio;
+                            currentCard = card;
+                        })
+                        .catch(error => {
+                            console.error("Playback failed (likely dummy URL):", error);
+                            alert("Preview unavailable for this demo track.");
+                        });
+                    }
+
+                } else {
+                    // Pause this track
+                    audio.pause();
+                    card.classList.remove('playing');
+                    playIcon.classList.remove('hidden');
+                    pauseIcon.classList.add('hidden');
+                    currentAudio = null;
+                    currentCard = null;
+                }
+
+                // Reset on end
+                audio.onended = () => {
+                    card.classList.remove('playing');
+                    playIcon.classList.remove('hidden');
+                    pauseIcon.classList.add('hidden');
+                    currentAudio = null;
+                };
+            };
+
+
+            // 3. SEARCH & FILTER LOGIC (Client-side Demo)
+            const searchInput = document.getElementById('searchInput');
+            const genreBtns = document.querySelectorAll('#genreFilters button');
+            const cards = document.querySelectorAll('.track-card');
+            let activeGenre = 'all';
+
+            function filterTracks() {
+                const query = searchInput.value.toLowerCase();
+                
+                cards.forEach(card => {
+                    const cardGenre = card.dataset.genre;
+                    const cardSearchData = card.dataset.search;
+                    
+                    const matchesGenre = activeGenre === 'all' || cardGenre === activeGenre;
+                    const matchesSearch = cardSearchData.includes(query);
+
+                    if (matchesGenre && matchesSearch) {
+                        card.style.display = 'block';
+                        // Optional: Add fade-in animation here
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+
+            searchInput.addEventListener('input', filterTracks);
+
+            genreBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Update active state
+                    genreBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    activeGenre = btn.dataset.genre;
+                    filterTracks();
+                });
+            });
+
+
+            // 4. SMOOTH 3D TILT EFFECT (Reused from Admin)
+            const tiltElements = document.querySelectorAll('.tilt-element');
+            tiltElements.forEach(el => {
+                let targetX = 0, targetY = 0, currentX = 0, currentY = 0;
+                const smoothing = 0.1; // Snappier than admin
+
+                function updateTilt() {
+                    currentX += (targetX - currentX) * smoothing;
+                    currentY += (targetY - currentY) * smoothing;
+                    // Subtler tilt for grid items
+                    const xDeg = currentY * 8; 
+                    const yDeg = -currentX * 8;
+                    
+                    if (Math.abs(targetX - currentX) > 0.001 || Math.abs(targetY - currentY) > 0.001) {
+                         el.style.transform = `perspective(1000px) rotateX(${xDeg}deg) rotateY(${yDeg}deg) scale3d(1.02, 1.02, 1.02)`;
+                         requestAnimationFrame(updateTilt);
+                    } else {
+                        // Stop animation loop when settled to save resources
+                        el.style.transform = `perspective(1000px) rotateX(${xDeg}deg) rotateY(${yDeg}deg) scale3d(1.02, 1.02, 1.02)`;
+                    }
+                }
+
+                el.addEventListener('mousemove', (e) => {
+                    const rect = el.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    targetX = (e.clientX - centerX) / (rect.width / 2);
+                    targetY = (e.clientY - centerY) / (rect.height / 2);
+                    
+                    // Start animation loop if not running
+                    if (currentX === 0 && currentY === 0) requestAnimationFrame(updateTilt);
+                });
+
+                el.addEventListener('mouseleave', () => {
+                    targetX = 0; targetY = 0;
+                    el.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+                    // Force reset currents so mousemove restarts loop
+                    setTimeout(() => { currentX = 0; currentY = 0; }, 300); 
+                });
+            });
+
         });
     </script>
 </body>

@@ -31,3 +31,14 @@ type Session struct {
     Expiry time.Time
 }
 
+type Tracks struct {
+    ID int `gorm:"primaryKey"`
+    TrackTitle string
+    ArtistName string
+    TrackCode string
+    Genre string
+    TrackPath string
+    Featured bool `gorm:"default:false"`
+    TrackAvatar string
+    gorm.Model
+}
