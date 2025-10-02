@@ -1,1 +1,3 @@
-# skiza-api
+# Skiza Tune
+
+- Safaricom skiza tune implementation

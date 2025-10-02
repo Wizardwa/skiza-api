@@ -1,0 +1,268 @@
+{{define "signupPage"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account | Lamahuraancomm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        body {
+            background: linear-gradient(135deg, #1d0f2b, #3b205d, #4c66a0);
+            background-size: 200% 200%;
+            animation: gradientBG 15s ease infinite;
+            overflow-x: hidden; /* Prevent horizontal scroll on small screens */
+        }
+
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Entry Animations */
+        .animated-panel {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        body.loaded .animated-panel {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        #signup-card-panel { animation-delay: 0.2s; }
+
+        .logo-text {
+            background: linear-gradient(90deg, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .icon-pulse {
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .interactive-card {
+            transform-style: preserve-3d;
+        }
+
+        input:focus {
+            box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.4);
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1e1b34; }
+        ::-webkit-scrollbar-thumb { background: #a78bfa; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #8b5cf6; }
+        
+        .toggle-password {
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        .toggle-password:hover {
+            color: #a78bfa;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen text-gray-200 p-4">
+    <canvas id="particle-canvas"></canvas>
+    <div class="content-wrapper flex flex-col items-center justify-center w-full max-w-lg">
+        <!-- Branding Header -->
+        <div class="animated-panel flex flex-col items-center text-center mb-8">
+            <div class="flex items-center mb-4">
+                <i class='bx bxs-music text-4xl text-violet-400 mr-3 icon-pulse'></i>
+                <h1 class="text-3xl font-bold logo-text">Lamahuraancomm</h1>
+            </div>
+            <p class="text-gray-400">Start your on-chain music journey.</p>
+        </div>
+
+        <!-- Signup Form Card -->
+        <div id="signup-card-panel" class="animated-panel w-full perspective-[1000px]">
+            <div id="signup-card" class="interactive-card bg-slate-900/60 border border-slate-700 backdrop-blur-sm p-8 md:p-10 rounded-xl shadow-2xl shadow-violet-500/10 w-full hover:shadow-violet-500/20">
+                <h2 class="text-3xl font-bold logo-text text-center mb-2">Join the Verse</h2>
+                <p class="text-center text-gray-400 mb-8">Create your account.</p>
+
+                <form method="post" action="/signup" class="space-y-5">
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                         <!-- Username -->
+                        <div>
+                            <label for="username" class="block text-sm font-medium text-gray-400 mb-2">Username</label>
+                            <div class="relative"><i class='bx bx-at absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg'></i><input type="text" id="username" name="username" placeholder="your_handle" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-600 bg-slate-800/50 focus:border-violet-500 focus:ring-0 focus:outline-none text-gray-200 placeholder:text-gray-500 transition-colors duration-300"></div>
+                        </div>
+                         <!-- Email -->
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-400 mb-2">Email Address</label>
+                            <div class="relative"><i class='bx bx-envelope absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg'></i><input type="email" id="email" name="email" placeholder="your@email.com" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-600 bg-slate-800/50 focus:border-violet-500 focus:ring-0 focus:outline-none text-gray-200 placeholder:text-gray-500 transition-colors duration-300"></div>
+                        </div>
+                        <!-- First Name -->
+                        <div>
+                            <label for="firstname" class="block text-sm font-medium text-gray-400 mb-2">First Name</label>
+                             <div class="relative"><i class='bx bx-user absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg'></i><input type="text" id="firstname" name="firstname" placeholder="John" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-600 bg-slate-800/50 focus:border-violet-500 focus:ring-0 focus:outline-none text-gray-200 placeholder:text-gray-500 transition-colors duration-300"></div>
+                        </div>
+                        <!-- Last Name -->
+                        <div>
+                            <label for="lastname" class="block text-sm font-medium text-gray-400 mb-2">Last Name</label>
+                            <div class="relative"><i class='bx bx-user absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg'></i><input type="text" id="lastname" name="lastname" placeholder="Doe" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-600 bg-slate-800/50 focus:border-violet-500 focus:ring-0 focus:outline-none text-gray-200 placeholder:text-gray-500 transition-colors duration-300"></div>
+                        </div>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="pt-2">
+                        <label for="password" class="block text-sm font-medium text-gray-400 mb-2">Password</label>
+                        <div class="relative">
+                            <i class='bx bxs-lock-alt absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg'></i>
+                            <input type="password" id="password" name="password" placeholder="Choose a secure password" required class="w-full pl-10 pr-10 py-3 rounded-lg border border-slate-600 bg-slate-800/50 focus:border-violet-500 focus:ring-0 focus:outline-none text-gray-200 placeholder:text-gray-500 transition-colors duration-300">
+                            <i class='bx bx-show toggle-password absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg'></i>
+                        </div>
+                    </div>
+
+                    <!-- Signup Button -->
+                    <button type="submit" class="w-full bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white py-3 px-4 rounded-lg font-semibold flex items-center justify-center space-x-2 mt-6 transition-all duration-300 hover:from-violet-600 hover:to-fuchsia-600 hover:shadow-lg hover:shadow-fuchsia-500/30 hover:scale-[1.02]">
+                        <i class='bx bx-user-plus text-xl'></i>
+                        <span>Create Account</span>
+                    </button>
+                </form>
+
+                <!-- Login Link -->
+                <div class="text-center mt-8">
+                    <p class="text-sm text-gray-400">Already have an account? <a href="/login/" class="font-semibold text-violet-400 hover:text-violet-300 hover:underline transition-colors">Login Here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- 0. TRIGGER ENTRY ANIMATIONS ---
+            document.body.classList.add('loaded');
+
+            // --- 1. PASSWORD VISIBILITY TOGGLE ---
+            document.querySelectorAll('.toggle-password').forEach(icon => {
+                icon.addEventListener('click', function () {
+                    const passwordInput = this.previousElementSibling;
+                    const isPassword = passwordInput.type === 'password';
+                    passwordInput.type = isPassword ? 'text' : 'password';
+                    this.classList.toggle('bx-show', !isPassword);
+                    this.classList.toggle('bx-hide', isPassword);
+                });
+            });
+
+            // --- 2. SMOOTH 3D TILT EFFECT ---
+            const signupCard = document.getElementById('signup-card');
+            if (signupCard) {
+                let targetX = 0, targetY = 0; let currentX = 0, currentY = 0;
+                const smoothing = 0.05;
+
+                const updateCardTilt = () => {
+                    currentX += (targetX - currentX) * smoothing; currentY += (targetY - currentY) * smoothing;
+                    const xDeg = currentY * 15; const yDeg = -currentX * 15;
+                    signupCard.style.transform = `perspective(1000px) rotateX(${xDeg}deg) rotateY(${yDeg}deg) scale(1.04)`;
+                    requestAnimationFrame(updateCardTilt);
+                };
+                updateCardTilt();
+
+                const container = signupCard.parentElement;
+                container.addEventListener('mousemove', (e) => {
+                    const rect = container.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2; const centerY = rect.top + rect.height / 2;
+                    targetX = (e.clientX - centerX) / (rect.width / 2); targetY = (e.clientY - centerY) / (rect.height / 2);
+                });
+                container.addEventListener('mouseleave', () => { targetX = 0; targetY = 0; });
+            }
+            
+            // --- 3. INTERACTIVE PARTICLE BACKGROUND ---
+            const canvas = document.getElementById('particle-canvas');
+            if(canvas) {
+                const ctx = canvas.getContext('2d');
+                canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+                let particlesArray;
+                const mouse = { x: null, y: null, radius: (canvas.height / 100) * (canvas.width / 100) };
+                
+                window.addEventListener('mousemove', e => { mouse.x = e.x; mouse.y = e.y; });
+                
+                class Particle {
+                    constructor(x, y, dX, dY, size) { this.x = x; this.y = y; this.directionX = dX; this.directionY = dY; this.size = size; }
+                    draw() {
+                        ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                        ctx.fillStyle = 'rgba(167, 139, 250, 0.4)'; ctx.fill();
+                    }
+                    update() {
+                        if (this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
+                        if (this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
+                        let dx = mouse.x - this.x, dy = mouse.y - this.y;
+                        let distance = Math.sqrt(dx*dx + dy*dy);
+                        if (distance < mouse.radius + this.size){
+                            if(mouse.x < this.x && this.x < canvas.width - this.size * 10) { this.x += 1; }
+                            if(mouse.x > this.x && this.x > this.size * 10) { this.x -= 1; }
+                            if(mouse.y < this.y && this.y < canvas.height - this.size * 10) { this.y += 1; }
+                            if(mouse.y > this.y && this.y > this.size * 10) { this.y -= 1; }
+                        }
+                        this.x += this.directionX; this.y += this.directionY; this.draw();
+                    }
+                }
+                function init() {
+                    particlesArray = [];
+                    let numParticles = (canvas.height * canvas.width) / 9000;
+                    for (let i = 0; i < numParticles; i++) {
+                        let size = (Math.random() * 2) + 1;
+                        let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
+                        let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+                        let dX = (Math.random() * 0.4) - 0.2, dY = (Math.random() * 0.4) - 0.2;
+                        particlesArray.push(new Particle(x, y, dX, dY, size));
+                    }
+                }
+                function animate() {
+                    requestAnimationFrame(animate);
+                    ctx.clearRect(0, 0, innerWidth, innerHeight);
+                    particlesArray.forEach(p => p.update());
+                    connect();
+                }
+                function connect() {
+                    for (let a = 0; a < particlesArray.length; a++) {
+                        for (let b = a; b < particlesArray.length; b++) {
+                            let distance = Math.pow(particlesArray[a].x - particlesArray[b].x, 2) + Math.pow(particlesArray[a].y - particlesArray[b].y, 2);
+                            if (distance < (canvas.width / 7) * (canvas.height / 7)) {
+                                let opacityValue = 1 - (distance / 20000);
+                                ctx.strokeStyle = `rgba(244, 114, 182, ${opacityValue})`;
+                                ctx.lineWidth = 0.5;
+                                ctx.beginPath(); ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                                ctx.lineTo(particlesArray[b].x, particlesArray[b].y); ctx.stroke();
+                            }
+                        }
+                    }
+                }
+                window.addEventListener('resize', () => {
+                    canvas.width = innerWidth; canvas.height = innerHeight;
+                    mouse.radius = (canvas.height / 100) * (canvas.width / 100);
+                    init();
+                });
+                window.addEventListener('mouseout', () => { mouse.x = undefined; mouse.y = undefined; });
+                init();
+                animate();
+            }
+        });
+    </script>
+</body>
+</html>
+{{end}}

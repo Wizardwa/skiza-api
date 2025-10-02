@@ -1,0 +1,91 @@
+{{define "staffSidebar"}}
+<!-- 
+    THEME-AWARE SIDEBAR (INSPIRED BY INDEXPAGE)
+    - Manages the global light/dark theme via a `data-theme` attribute on <html>.
+    - Uses Alpine.js to control its own state and the global theme.
+    - Styled with glassmorphism (backdrop-filter) for a modern look.
+-->
+<div x-data="{ 
+        isOpen: window.innerWidth >= 768, 
+        theme: localStorage.getItem('theme') || 'dark'
+     }"
+     x-init="
+        document.documentElement.setAttribute('data-theme', theme);
+        $watch('theme', value => {
+            localStorage.setItem('theme', value);
+            document.documentElement.setAttribute('data-theme', value);
+        });
+     "
+     @resize.window="isOpen = window.innerWidth >= 768" 
+     class="relative">
+
+    <!-- Mobile Menu Button -->
+    <button @click="isOpen = !isOpen" title="Open Menu"
+            class="md:hidden fixed top-4 left-4 z-50 p-2 rounded-md bg-control text-secondary backdrop-blur-sm shadow-md border border-color focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-glow">
+        <i class='bx bx-menu text-2xl'></i>
+    </button>
+
+    <!-- Overlay (for mobile view) -->
+    <div x-show="isOpen" 
+         x-transition:enter="transition-opacity ease-in-out duration-300"
+         x-transition:leave="transition-opacity ease-in-out duration-300"
+         @click="isOpen = false" 
+         class="fixed inset-0 bg-black/60 z-30 md:hidden" x-cloak>
+    </div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar"
+           class="bg-card text-primary backdrop-blur-lg min-h-screen flex flex-col shadow-lg transition-all duration-300 ease-in-out 
+                  fixed inset-y-0 left-0 z-40 md:relative md:translate-x-0 border-r border-color"
+           :class="{ 'w-64': isOpen, 'w-20': !isOpen, 'translate-x-0': isOpen, '-translate-x-full': !isOpen && window.innerWidth < 768 }">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between p-4 border-b border-color h-[65px] flex-shrink-0">
+            <a href="/admin/" class="flex items-center space-x-3 overflow-hidden">
+                <i class='bx bxs-music text-3xl text-primary-glow flex-shrink-0'></i>
+                <span class="text-xl font-bold whitespace-nowrap logo-text" x-show="isOpen">Lamahuraancomm</span>
+            </a>
+            <button @click="isOpen = !isOpen" title="Toggle Sidebar" class="text-2xl text-secondary hover:text-primary cursor-pointer hidden md:block">
+                 <i class='bx' :class="isOpen ? 'bx-x' : 'bx-menu'"></i>
+            </button>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 mt-4 px-2 space-y-1 overflow-y-auto">
+            <a href="/admin" class="nav-link group flex items-center px-3 py-2.5 text-sm font-medium rounded-md hover:bg-hover hover:text-primary transition-colors duration-150" :class="!isOpen && 'justify-center'">
+                <i class='bx bxs-dashboard text-xl mr-3 text-secondary group-hover:text-primary-glow transition-colors duration-150' :class="!isOpen && 'mr-0'"></i>
+                <span class="whitespace-nowrap text-inherit" :class="!isOpen && 'md:hidden'">Dashboard</span>
+            </a>
+            <a href="/admin/create" class="nav-link group flex items-center px-3 py-2.5 text-sm font-medium rounded-md hover:bg-hover hover:text-primary transition-colors duration-150" :class="!isOpen && 'justify-center'">
+                <i class='bx bxs-dashboard text-xl mr-3 text-secondary group-hover:text-primary-glow transition-colors duration-150' :class="!isOpen && 'mr-0'"></i>
+                <span class="whitespace-nowrap text-inherit" :class="!isOpen && 'md:hidden'">Create</span>
+            </a>
+        </nav>
+
+        <!-- Footer Area -->
+        <div class="mt-auto border-t border-color p-3 space-y-3 flex-shrink-0">
+             <!-- Theme Toggle -->
+            <button @click="theme = (theme === 'dark' ? 'light' : 'dark')" class="w-full group flex items-center px-3 py-2.5 text-sm font-medium rounded-md hover:bg-hover hover:text-primary transition-colors duration-150" :class="!isOpen && 'justify-center'">
+                <span x-show="theme === 'dark'" x-cloak><i class='bx bxs-sun text-xl mr-3 text-secondary group-hover:text-yellow-400' :class="!isOpen && 'mr-0'"></i></span>
+                <span x-show="theme === 'light'" x-cloak><i class='bx bxs-moon text-xl mr-3 text-secondary group-hover:text-primary-glow' :class="!isOpen && 'mr-0'"></i></span>
+                <span class="whitespace-nowrap text-inherit" :class="!isOpen && 'md:hidden'">
+                    <span x-show="theme === 'dark'" x-cloak>Light Mode</span>
+                    <span x-show="theme === 'light'" x-cloak>Dark Mode</span>
+                </span>
+            </button>
+            
+            <!-- Profile Section -->
+             <div class="flex items-center" :class="!isOpen && 'justify-center'">
+                <img src="/media/default-avatar.jpg" alt="Admin avatar" class="h-10 w-10 rounded-full border-2 border-slate-600 dark:border-slate-600 flex-shrink-0">
+                <div class="ml-3 overflow-hidden" :class="!isOpen && 'md:hidden'">
+                    <p class="text-sm font-medium text-primary whitespace-nowrap">Admin User</p>
+                    <p class="text-xs text-secondary whitespace-nowrap">Administrator</p>
+                </div>
+                <a href="/logout" title="Logout" class="ml-auto text-secondary hover:text-red-500 transition-colors duration-150" :class="!isOpen && 'md:hidden'">
+                    <i class="bx bx-log-out text-xl"></i>
+                </a>
+            </div>
+        </div>
+    </aside>
+</div>
+{{end}}
