@@ -51,6 +51,9 @@ func Routes(db *gorm.DB, SessionManager *scs.SessionManager) http.Handler {
 		router.Get("/admin", h.AdminDashHandler)
 		router.Get("/admin/create", h.AdminCreateHandler)
 		router.Post("/admin/create", h.AdminCreateHandler)
+		router.Post("/admin/create/edit", h.AdminCreateHandler)
+		router.Get("/admin/create/edit", h.AdminCreateHandler)
+		router.Post("/admin/create/delete-track/{id}", h.AdminCreateHandler)
 	})
 
 

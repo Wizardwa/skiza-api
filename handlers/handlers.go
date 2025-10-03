@@ -241,7 +241,6 @@ func (h *Handler) HomeHandler(w http.ResponseWriter, r *http.Request) {
 
 //admin
 func (h *Handler) AdminDashHandler(w http.ResponseWriter, r *http.Request) {
-	// --- Your existing data fetching for core metrics ---
 	var totalUsers, totalTracks, featuredTracks, newTracksThisMonth int64
 	h.DB.Model(&models.User{}).Count(&totalUsers)
 	h.DB.Model(&models.Tracks{}).Count(&totalTracks)
@@ -250,7 +249,6 @@ func (h *Handler) AdminDashHandler(w http.ResponseWriter, r *http.Request) {
 	startOfMonth := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
 	h.DB.Model(&models.Tracks{}).Where("created_at >= ?", startOfMonth).Count(&newTracksThisMonth)
 
-	// --- Your existing data fetching for genre chart ---
 	type GenreCount struct {
 		Genre string
 		Count int
@@ -266,12 +264,10 @@ func (h *Handler) AdminDashHandler(w http.ResponseWriter, r *http.Request) {
 	genreLabelsJSON, _ := json.Marshal(genreLabels)
 	genreDataJSON, _ := json.Marshal(genreData)
 
-	// --- Your existing data fetching for recent subscriptions ---
 	var recentSubscriptions []models.SessionIdResponse
 	h.DB.Order("created_at DESC").Limit(5).Find(&recentSubscriptions)
 
-	// --- CRITICAL ADDITION: Marshal recent subscriptions for JavaScript ---
-	recentSubsJSON, _ := json.Marshal(recentSubscriptions) // <-- ADD THIS LINE
+	recentSubsJSON, _ := json.Marshal(recentSubscriptions)
 
 	// --- Assemble All Data ---
 	data := AnalyticsData{
@@ -279,15 +275,14 @@ func (h *Handler) AdminDashHandler(w http.ResponseWriter, r *http.Request) {
 		TotalTracks:             totalTracks,
 		FeaturedTracks:          featuredTracks,
 		NewTracksThisMonth:      newTracksThisMonth,
-		RecentSubscriptions:     recentSubscriptions, // You can keep this if needed elsewhere
+		RecentSubscriptions:     recentSubscriptions,
 
 		// Cast the JSON strings to template.JS
 		GenreDistributionLabels: template.JS(genreLabelsJSON),
 		GenreDistributionData:   template.JS(genreDataJSON),
-		RecentSubscriptionsJS:   template.JS(recentSubsJSON), // <-- ADD THIS LINE
+		RecentSubscriptionsJS:   template.JS(recentSubsJSON),
 	}
 
-	// Render the template
 	rend.HTML(w, http.StatusOK, "adminAnalyticsPage", data)
 }
 
@@ -302,7 +297,7 @@ func (h *Handler) AdminCreateHandler(w http.ResponseWriter, r *http.Request) {
 			featured := r.FormValue("is_featured")
 			trackIcon, trackIconHandler, err := r.FormFile("track_icon")
 			trackFile,handler,err := r.FormFile("track_file")
-			fmt.Println(trackTitle, artistName, trackCode, genre, featured)
+			//fmt.Println(trackTitle, artistName, trackCode, genre, featured)
 			if err != nil {
 				fmt.Println("Failed to read file content")
 			}
@@ -358,6 +353,106 @@ func (h *Handler) AdminCreateHandler(w http.ResponseWriter, r *http.Request) {
 				if err := h.DB.Create(&track).Error; err != nil {
 					fmt.Println("Failed to create track record!")
 				}
+			}
+		}
+	}else if uri == "/admin/create/edit" {
+		if r.Method == http.MethodPost {
+			trackId := r.FormValue("track_id")
+			trackTitle := r.FormValue("track_title")
+			artistName := r.FormValue("artist_name")
+			trackCode := r.FormValue("track_code")
+			genre := r.FormValue("genre")
+			featured := r.FormValue("is_featured")
+			trackIcon, trackIconHandler, err := r.FormFile("track_icon")
+			trackFile,handler,err := r.FormFile("track_file")
+
+			if err != nil {
+				fmt.Println("Failed to read file contents!")
+			}
+
+			fmt.Println(trackTitle, artistName, trackCode, genre, featured)
+		
+			var tracks models.Tracks
+
+			//check if exists
+			result := h.DB.Where("id = ?", trackId).Find(&tracks).First(&tracks)
+
+			if result.Error != nil {
+				fmt.Println("Cannot edit record does not exist!")
+			}else{
+				originalTitle := tracks.TrackTitle
+				if trackTitle != "" && originalTitle != trackTitle {
+					tracks.TrackTitle = trackTitle
+				}
+				if artistName != "" && tracks.ArtistName != artistName {
+					tracks.ArtistName = artistName
+				}
+				if trackCode != "" && tracks.TrackCode != trackCode {
+					tracks.TrackCode = trackCode
+				}
+				if genre != "" && tracks.Genre != genre {
+					tracks.Genre = genre
+				}
+				if featured != "" && featured == "on" || featured == "off"{
+					if featured == "on" {
+						//check if stored value is true or false
+						if !tracks.Featured {
+							tracks.Featured = true
+						}else{
+							tracks.Featured = false
+						}
+					}
+				}
+
+				if trackFile != nil {
+					defer trackFile.Close()
+					dst, err := os.Create(filepath.Join(uploadPath, handler.Filename))
+					if err != nil {
+						fmt.Println("Failed to create file path")
+					}
+					defer dst.Close()
+					if _, err := io.Copy(dst, trackFile); err != nil {
+						fmt.Println("Failed to copy audio track to destination!")
+					}
+					fmt.Println("File uploaded successfully")
+					trackPath := "media/" + handler.Filename
+					tracks.TrackPath = trackPath
+
+					//check image
+					var icon string
+					if trackIcon != nil {
+						defer trackIcon.Close()
+						imgDst, err := os.Create(filepath.Join(uploadPath, trackIconHandler.Filename))
+						if err != nil {
+							fmt.Println("Failed to create icon file path!")
+						}
+						defer imgDst.Close()
+						if _, err := io.Copy(imgDst, trackIcon); err != nil {
+							fmt.Println("Failed to copy icon to destination!")
+						}
+						icon = trackIconHandler.Filename
+						tracks.TrackAvatar = icon
+						fmt.Println("Icon uploaded successfully")
+					}else{
+						icon = ""
+						tracks.TrackAvatar = icon
+					}
+
+				}
+
+				if err := h.DB.Model(&tracks).Where("id = ?", tracks.ID).Updates(&tracks).Error; err != nil {
+					fmt.Println("Failed to update record!")
+				}
+
+			}
+
+		}
+	}else if strings.HasPrefix(uri, "/admin/create/delete-track/") {
+		id := strings.TrimPrefix(uri, "/admin/create/delete-track/")
+		if id != "" {
+			if r.Method == http.MethodPost {
+				var record models.Tracks
+				h.DB.Unscoped().Where("id = ?", id).Delete(&record)
 			}
 		}
 	}
