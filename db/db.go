@@ -24,6 +24,7 @@ func Init() *gorm.DB {
 		&models.Role{},
 		&models.Session{},
 		&models.Tracks{},
+		&models.SessionIdResponse{},
 	)
 	if err != nil {
 		fmt.Println("Error")	

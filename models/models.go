@@ -42,3 +42,17 @@ type Tracks struct {
     TrackAvatar string
     gorm.Model
 }
+
+type SessionIdResponse struct {
+    ID int `gorm:"primaryKey"`
+    RequestRefId string
+    ResponseMessage string
+    CustomerMessage string
+    SessionID string
+    RedirectURL string
+    Product string
+    ProductType string
+    ProductCode string
+    ProductDetails string
+    gorm.Model
+}

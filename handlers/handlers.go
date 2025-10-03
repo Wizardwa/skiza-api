@@ -21,8 +21,8 @@ import (
 	"path/filepath"
 	_"github.com/go-chi/chi/v5"
 	_"strconv"
-	_"strings"
-	_"bytes"
+	"strings"
+	"bytes"
 	_"crypto/hmac"
 	_"crypto/sha256"
 	_"encoding/hex"
@@ -33,6 +33,7 @@ import (
 	_"math/rand"
 	_"encoding/csv"
 	_"github.com/xuri/excelize/v2"
+	b64 "encoding/base64"
 )
 
 var rend = render.New(
@@ -57,9 +58,142 @@ type ForgotUser struct {
 	Email string `json:"email"`
 }
 
+type AccessTokenBody struct {
+	AccessToken string `json:"access_token"`
+	ExpiresIn string `json:"expires_in"`
+}
+
+type Body struct {
+	SessionID string `json:"sessionID"`
+	RedirectURL string `json:"redirectURL"`
+	Product string `json:"product"`
+	ProductType string `json:"productType"`
+	ProductCode string `json:"productCode"`
+	ProductDetails string `json:"productDetails"`
+}
+
+type Header struct {
+	RequestRefId string `json:"requestRefId"`
+	ResponseCode int `json:"responseCode"`
+	ResponseMessage string `json:"responseMessage"`
+	CustomerMessage string `json:"customerMessage"`
+	Timestamp string `json:"timestamp"`
+}
+
+type SessionResponse struct {
+	Header Header `json:"header"`
+	Body Body `json:"body"`
+}
+
+
+func GetAccessToken() string {
+	skizaKey := os.Getenv("skiza_key")
+	skizaSecret := os.Getenv("skiza_secret")
+	key_sec := skizaKey + ":" + skizaSecret
+	dEnc := b64.StdEncoding.EncodeToString([]byte(key_sec))
+
+	url := "https://api.safaricom.co.ke/oauth2/v1/generate?grant_type=client_credentials"
+	req, _ := http.NewRequest("POST", url, nil)
+	req.Header.Add("Authorization", "Basic " + dEnc)
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+
+	var body AccessTokenBody
+
+	err := json.NewDecoder(res.Body).Decode(&body)
+	if err != nil {
+		fmt.Println("Failed to decode json body!")
+	}
+
+	return body.AccessToken
+}
+
+func GetSessionID(h *Handler,phone string, skizaCode string) {
+	token := GetAccessToken()
+	url := "https://api.safaricom.co.ke/v1/skizasession/id"
+	payload := map[string]interface{}{
+		"product":"SKIZA", 
+		"encryption":"none", 
+		"subscriberNumber": phone, 
+		"productType":"SKIZA_RBT", 
+		"productCode": skizaCode, 
+		"cspid":"601756",
+	}
+	jsonData, err := json.Marshal(payload)
+	if err != nil {
+		fmt.Println("Failed to marshal json payload!")
+	}
+	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
+	req.Header.Add("Content-Type","application/json")
+	req.Header.Add("Authorization", "Bearer " + token)
+	req.Header.Add("x-correlation-conversationid","6c2cd56f-c578-4218-8a11-b0bbc7b1e248")
+	req.Header.Add("X-MessageID", "7d514c09-02e6-4765-8811-0e808f997bb2")
+	req.Header.Add("X-Source-System","dxl-ms-starter")
+	req.Header.Add("X-App","partner-portal")
+	req.Header.Add("X-Msisdn",phone)
+
+	res, _ := http.DefaultClient.Do(req)
+	defer res.Body.Close()
+
+	var body SessionResponse
+	err = json.NewDecoder(res.Body).Decode(&body)
+	if err != nil {
+		fmt.Println("Failed to decode session body json!")
+	}
+	//store session data
+	sess := models.SessionIdResponse{
+		RequestRefId : body.Header.RequestRefId,
+    	ResponseMessage : body.Header.ResponseMessage,
+    	CustomerMessage : body.Header.CustomerMessage,
+    	SessionID : body.Body.SessionID,
+    	RedirectURL : body.Body.RedirectURL,
+    	Product : body.Body.Product,
+    	ProductType : body.Body.ProductType,
+    	ProductCode : body.Body.ProductCode,
+    	ProductDetails : body.Body.ProductDetails,
+	}
+	if err := h.DB.Create(&sess).Error; err != nil {
+		fmt.Println("Failed to create session response record")
+	}
+}
+
+func formatNumber(number string) string {
+	if strings.HasPrefix(number, "01") || strings.HasPrefix(number, "07") {
+		return "0" + number[1:]
+	}
+
+	return number
+}
 
 //index
 func (h *Handler) HomeHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		skizaCode := r.FormValue("skiza_code")
+		phoneNumber := r.FormValue("phone_number")
+		if skizaCode != "" && phoneNumber != "" {
+			//check if skiza code exists
+			var tracks models.Tracks
+
+			result := h.DB.Where("track_code = ?", skizaCode).Find(&tracks).First(&tracks)
+			if result.Error != nil {
+				fmt.Println("Record not found")
+				http.Redirect(w, r, "/", http.StatusSeeOther)
+			}else{
+				//call api endpoints
+				parsedPhone := formatNumber(phoneNumber)
+				GetSessionID(h,parsedPhone, tracks.TrackCode)
+			}
+			
+
+		}else{
+			http.Redirect(w,r, "/", http.StatusSeeOther)
+		}
+
+	}
+
+	//show tracks
 	var tracks []models.Tracks
 	h.DB.Find(&tracks)
 	data := map[string]interface{}{

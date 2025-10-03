@@ -103,7 +103,9 @@
                     </div>
                 </div>
                 <div class="mb-4"><span class="text-xs font-bold uppercase tracking-wider" style="color: var(--secondary-glow);">{{.Genre}}</span><h3 class="text-xl font-bold truncate" style="color: var(--text-primary);">{{.TrackTitle}}</h3><p class="text-sm truncate" style="color: var(--text-secondary);">{{.ArtistName}}</p></div>
-                <div class="flex items-center justify-between pt-4 border-t border-color"><div class="font-mono text-sm font-bold p-2 rounded-lg" style="color: var(--text-primary);">CODE: {{.TrackCode}}</div><button @click="openSubModal({ title: `{{.TrackTitle}}`, artist: `{{.ArtistName}}`, code: `{{.TrackCode}}` })" class="bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 text-white p-2 rounded-full shadow-lg transition-all hover:scale-110 hover:shadow-violet-500/50" title="Subscribe"><i class='bx bx-dialpad-alt text-xl'></i></button></div>
+                <div class="flex items-center justify-between pt-4 border-t border-color"><div class="font-mono text-sm font-bold p-2 rounded-lg" style="color: var(--text-primary);"></div>
+                <button @click="openSubModal({ title: `{{.TrackTitle}}`, artist: `{{.ArtistName}}`, code: `{{.TrackCode}}` })" class="bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 text-white p-2 rounded-full shadow-lg transition-all hover:scale-110 hover:shadow-violet-500/50" title="Subscribe"><i class='bx bx-dialpad-alt text-xl'></i>
+                </button></div>
             </div>
             {{else}}
             <p class="text-center text-secondary col-span-full">No tracks available at the moment.</p>
@@ -124,7 +126,29 @@
 
     <footer class="glass border-t border-color py-8 text-center text-sm" style="color: var(--text-secondary);"><p>&copy; 2024 Lamahuraancomm. The heartbeat of Skiza.</p></footer>
 
-    <div x-show="isSubModalOpen" x-transition.opacity class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" x-cloak><div @click.outside="isSubModalOpen = false" x-show="isSubModalOpen" x-transition class="glass rounded-xl shadow-2xl w-full max-w-md p-8"><div class="flex justify-between items-start mb-4"><h3 class="text-2xl font-bold text-primary" x-text="subModalData.title"></h3><button @click="isSubModalOpen = false" class="text-secondary hover:text-primary text-2xl">&times;</button></div><p class="text-secondary -mt-4" x-text="subModalData.artist"></p><div class="text-center bg-control rounded-lg p-3 my-4"><p class="text-secondary text-sm">SKIZA CODE</p><p class="text-2xl font-mono font-bold tracking-widest text-primary" x-text="subModalData.code"></p></div><form action="/subscribe" method="post"><input type="hidden" name="skiza_code" :value="subModalData.code"><div><label for="phone_number" class="text-sm font-medium text-secondary mb-1 block">Your Phone Number</label><input type="tel" name="phone_number" id="phone_number" placeholder="07XX XXX XXX" required class="search-input w-full py-3 px-4 rounded-lg text-lg"></div><button type="submit" class="w-full mt-6 bg-gradient-to-r from-violet-600 to-cyan-600 text-white font-bold py-3 rounded-lg hover:scale-105 transition-transform">Subscribe Now</button></form></div></div>
+    <div x-show="isSubModalOpen" x-transition.opacity class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" x-cloak>
+        <div @click.outside="isSubModalOpen = false" x-show="isSubModalOpen" x-transition class="glass rounded-xl shadow-2xl w-full max-w-md p-8">
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="text-2xl font-bold text-primary" ></h3>
+                <button @click="isSubModalOpen = false" class="text-secondary hover:text-primary text-2xl">&times;</button>
+            </div>
+        <p class="text-secondary text-sm">Artist</p>
+        <br>
+        <p class="text-secondary -mt-4" x-text="subModalData.artist"></p>
+        <div class="text-center bg-control rounded-lg p-3 my-4">
+            <!-- <p class="text-secondary text-sm">Track</p> -->
+            <p class="text-2xl font-mono font-bold tracking-widest text-primary" x-text="subModalData.title"></p>
+        </div>
+    <form action="/" method="post">
+        <input type="hidden" name="skiza_code" :value="subModalData.code">
+        <div>
+            <label for="phone_number" class="text-sm font-medium text-secondary mb-1 block">Your Phone Number</label>
+            <input type="tel" name="phone_number" id="phone_number" placeholder="07XX XXX XXX" required class="search-input w-full py-3 px-4 rounded-lg text-lg">
+        </div>
+        <button type="submit" class="w-full mt-6 bg-gradient-to-r from-violet-600 to-cyan-600 text-white font-bold py-3 rounded-lg hover:scale-105 transition-transform">Subscribe Now</button>
+    </form>
+</div>
+</div>
     
     <div x-show="currentTrack.src" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="translate-y-0" x-transition:leave-end="translate-y-full" class="fixed bottom-0 left-0 right-0 z-50 glass border-t border-color" x-cloak>
         <audio x-ref="audioPlayer" @timeupdate="updateProgress()" @loadedmetadata="onLoadedMetadata()" @ended="onEnded()"></audio>
@@ -142,6 +166,9 @@
     </div>
 
     <script>
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
         function pageController() {
             return {
                 theme: 'dark', isSubModalOpen: false, subModalData: {}, searchQuery: '', activeGenre: 'all', currentPage: 1, itemsPerPage: 8,

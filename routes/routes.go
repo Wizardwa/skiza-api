@@ -22,6 +22,7 @@ func Routes(db *gorm.DB, SessionManager *scs.SessionManager) http.Handler {
 	h := &handlers.Handler{DB: db, SessionManager: SessionManager,}
 	router.Use(SessionManager.LoadAndSave)
 	router.Get("/", h.HomeHandler)
+	router.Post("/", h.HomeHandler)
 
 	//auth routes
 	router.Get("/login", h.LoginHandler)
