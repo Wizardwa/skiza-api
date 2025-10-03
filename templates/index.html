@@ -6,479 +6,207 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lamahuraancomm | Discover Top Skiza Tunes</title>
     
-    <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <style>
-        /* --- MASTER THEME VARIABLES --- */
         :root {
-            --font-main: 'Inter', sans-serif;
-            --primary-glow: #8b5cf6; /* Violet */
-            --secondary-glow: #06b6d4; /* Cyan */
-            
-            /* Dark Mode (Default) */
-            --bg-main: #0F0F1B;
-            --bg-card: rgba(30, 30, 45, 0.5);
-            --bg-control: rgba(255, 255, 255, 0.05);
-            --border-color: rgba(255, 255, 255, 0.08);
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
+            --font-main: 'Inter', sans-serif; --primary-glow: #8b5cf6; --secondary-glow: #06b6d4;
+            --bg-main: #0F0F1B; --bg-card: rgba(30, 30, 45, 0.5); --bg-control: rgba(255, 255, 255, 0.05);
+            --border-color: rgba(255, 255, 255, 0.08); --text-primary: #f8fafc; --text-secondary: #94a3b8;
             --shadow-soft: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-            
             --bg-animated: radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
                            radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 40%),
                            linear-gradient(135deg, #0F0F1B 0%, #1a1a2e 100%);
         }
-
         [data-theme="light"] {
-            --bg-main: #f8fafc;
-            --bg-card: rgba(255, 255, 255, 0.6);
-            --bg-control: rgba(0, 0, 0, 0.03);
-            --border-color: rgba(0, 0, 0, 0.06);
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
+            --bg-main: #f8fafc; --bg-card: rgba(255, 255, 255, 0.6); --bg-control: rgba(0, 0, 0, 0.03);
+            --border-color: rgba(0, 0, 0, 0.06); --text-primary: #1e293b; --text-secondary: #64748b;
             --shadow-soft: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-            
             --bg-animated: radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
                            radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.1) 0%, transparent 50%),
                            linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
         }
-
-        /* --- Base Styles & Animations --- */
-        body {
-            font-family: var(--font-main);
-            background: var(--bg-animated);
-            background-attachment: fixed; /* Keeps bg steady while scrolling */
-            color: var(--text-primary);
-            transition: color 0.3s ease, background 0.3s ease;
-            min-height: 100vh; display: flex; flex-direction: column;
-            overflow-x: hidden;
-        }
-
-        .glass {
-            background: var(--bg-card);
-            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-soft);
-        }
-
-        .logo-text {
-            font-weight: 900;
-            background: linear-gradient(135deg, var(--primary-glow), var(--secondary-glow));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-
-        /* --- Sonic Card Styles --- */
-        .track-card {
-            border-radius: 16px; overflow: hidden;
-            transition: transform 0.1s ease-out, box-shadow 0.3s ease; /* Smooth tilt, standard hover shadow */
-            transform-style: preserve-3d;
-        }
-        /* The tilt effect is handled by JS, but we add a subtle lift on hover */
+        html { scroll-behavior: smooth; }
+        body { font-family: var(--font-main); background: var(--bg-animated); background-attachment: fixed; color: var(--text-primary); transition: color 0.3s ease, background 0.3s ease; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+        .glass { background: var(--bg-card); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border-color); box-shadow: var(--shadow-soft); }
+        .logo-text { font-weight: 900; background: linear-gradient(135deg, var(--primary-glow), var(--secondary-glow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .track-card { border-radius: 16px; overflow: hidden; transition: transform 0.1s ease-out, box-shadow 0.3s ease; transform-style: preserve-3d; }
         .track-card:hover { box-shadow: 0 15px 40px -10px rgba(139, 92, 246, 0.3); }
-
-        .cover-art-wrapper {
-            position: relative; aspect-ratio: 1 / 1; overflow: hidden;
-            background: linear-gradient(45deg, #3b205d, #1d0f2b);
-        }
+        .cover-art-wrapper { position: relative; aspect-ratio: 1 / 1; overflow: hidden; background: linear-gradient(45deg, #3b205d, #1d0f2b); }
         [data-theme="light"] .cover-art-wrapper { background: linear-gradient(45deg, #e0e7ff, #f3e8ff); }
-
-        /* Play Overlay */
-        .play-overlay {
-            position: absolute; inset: 0; background: rgba(0,0,0,0.3);
-            display: flex; align-items: center; justify-content: center;
-            opacity: 0; transition: opacity 0.3s ease; cursor: pointer;
-        }
+        .play-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; cursor: pointer; }
         .track-card:hover .play-overlay, .track-card.playing .play-overlay { opacity: 1; }
-        .play-btn {
-            width: 56px; height: 56px; border-radius: 50%;
-            background: var(--primary-glow); color: white;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 32px; box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
+        .play-btn { width: 56px; height: 56px; border-radius: 50%; background: var(--primary-glow); color: white; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 0 20px rgba(139, 92, 246, 0.5); transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
         .play-overlay:hover .play-btn { transform: scale(1.15); }
-        .track-card.playing .cover-art-wrapper img { transform: scale(1.1); } /* Pulse effect if using real images */
-
-        /* Live Visualizer (CSS Animation) */
-        .visualizer { display: flex; align-items: flex-end; gap: 2px; height: 16px; margin-left: 8px; opacity: 0; }
-        .track-card.playing .visualizer { opacity: 1; }
-        .bar { width: 3px; background: var(--secondary-glow); border-radius: 2px; animation: equalize 0.8s infinite alternate; }
-        .bar:nth-child(1) { height: 60%; animation-delay: -0.4s; }
-        .bar:nth-child(2) { height: 100%; animation-delay: -0.2s; }
-        .bar:nth-child(3) { height: 80%; animation-delay: 0s; }
-        @keyframes equalize { 0% { height: 20%; } 100% { height: 100%; } }
-
-        /* Skiza Code Badge */
-        .skiza-badge {
-            background: var(--bg-control); border: 1px solid var(--border-color);
-            font-family: 'Courier New', monospace; letter-spacing: 1px;
-        }
-
-        /* Search & Filter Inputs */
-        .search-input {
-            background: var(--bg-card); border: 1px solid var(--border-color);
-            color: var(--text-primary); backdrop-filter: blur(10px);
-        }
+        .track-card.playing .cover-art-wrapper { box-shadow: inset 0 0 0 3px var(--primary-glow); }
+        .search-input { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-primary); backdrop-filter: blur(10px); }
         .search-input:focus { outline: none; border-color: var(--primary-glow); box-shadow: 0 0 15px -3px var(--primary-glow); }
-        .filter-chip {
-            background: var(--bg-control); color: var(--text-secondary);
-            border: 1px solid transparent; cursor: pointer; transition: all 0.3s;
-        }
-        .filter-chip:hover, .filter-chip.active {
-            background: rgba(139, 92, 246, 0.15); color: var(--primary-glow);
-            border-color: var(--primary-glow);
-        }
+        .filter-chip { background: var(--bg-control); color: var(--text-secondary); border: 1px solid transparent; cursor: pointer; transition: all 0.3s; }
+        .filter-chip:hover, .filter-chip.active { background: rgba(139, 92, 246, 0.15); color: var(--primary-glow); border-color: var(--primary-glow); }
+        .pagination-btn { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-secondary); }
+        .pagination-btn:hover { color: var(--primary-glow); border-color: var(--primary-glow); }
+        .pagination-btn.active { background: var(--primary-glow); color: white; border-color: var(--primary-glow); }
+        .pagination-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        input[type=range] { -webkit-appearance: none; background: transparent; cursor: pointer; width: 100%; }
+        input[type=range]::-webkit-slider-runnable-track { height: 6px; background: rgba(124, 58, 237, 0.2); border-radius: 3px; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; background-color: var(--primary-glow); border-radius: 50%; margin-top: -5px; box-shadow: 0 0 10px rgba(124, 58, 237, 0.7); }
+        [x-cloak] { display: none !important; }
     </style>
 </head>
-<body>
+<body x-data="pageController()" x-init="init()" :class="{ 'overflow-hidden': isSubModalOpen, 'pb-28': currentTrack.src }" class="transition-all">
 
-    <!-- Navbar -->
     <nav class="w-full px-6 py-4 flex justify-between items-center z-50 glass sticky top-0">
-        <div class="flex items-center gap-2">
-            <i class='bx bxs-music text-3xl text-violet-500 animate-pulse'></i>
-            <span class="text-2xl logo-text">Lamahuraancomm</span>
-        </div>
-        <div class="flex items-center gap-6">
-            <a href="/login" class="text-sm font-medium text-var(--text-secondary) hover:text-var(--primary-glow) transition-colors hidden md:block">Login</a>
-            <!-- Theme Toggle -->
-            <button id="theme-toggle" class="w-10 h-10 rounded-full bg-control border border-color flex items-center justify-center text-var(--text-secondary) hover:text-var(--primary-glow) transition-all">
-                <i class='bx bxs-moon text-xl dark-icon hidden'></i>
-                <i class='bx bxs-sun text-xl light-icon'></i>
-            </button>
-        </div>
+        <div class="flex items-center gap-2"><i class='bx bxs-music text-3xl text-violet-500 animate-pulse'></i><span class="text-2xl logo-text">Lamahuraancomm</span></div>
+        <div class="flex items-center gap-6"><a href="/login" class="text-sm font-medium text-secondary hover:text-primary transition-colors hidden md:block">Login</a><button @click="toggleTheme()" class="w-10 h-10 rounded-full bg-control border border-color flex items-center justify-center text-secondary hover:text-primary transition-all"><i class='bx bxs-moon text-xl' x-show="theme === 'light'"></i><i class='bx bxs-sun text-xl' x-show="theme === 'dark'"></i></button></div>
     </nav>
 
-    <!-- Hero & Search Section -->
-    <header class="relative pt-20 pb-16 px-4 text-center max-w-5xl mx-auto">
-        <h1 class="text-5xl md:text-7xl font-black mb-6 bg-clip-text text-transparent bg-gradient-to-r from-slate-100 to-slate-400 dark:from-white dark:to-slate-400" style="color: var(--text-primary);">
-            Find Your Sound.
-        </h1>
-        <p class="text-xl text-var(--text-secondary) mb-10 max-w-2xl mx-auto leading-relaxed" style="color: var(--text-secondary);">
-            Browse the ultimate collection of Skiza tunes. Set the rhythm that defines you.
-        </p>
-        
-        <!-- Search and Filters -->
+    <header id="page-header" class="relative pt-20 pb-16 px-4 text-center max-w-5xl mx-auto">
+        <h1 class="text-5xl md:text-7xl font-black mb-6" style="color: var(--text-primary);">Find Your Sound.</h1>
+        <p class="text-xl mb-10 max-w-2xl mx-auto leading-relaxed" style="color: var(--text-secondary);">Browse the ultimate collection of Skiza tunes. Set the rhythm that defines you.</p>
         <div class="flex flex-col items-center gap-6 w-full max-w-3xl mx-auto">
-            <!-- Search Bar -->
-            <div class="relative w-full group">
-                <i class='bx bx-search absolute left-4 top-1/2 transform -translate-y-1/2 text-2xl text-gray-400 group-focus-within:text-violet-500 transition-colors'></i>
-                <input type="text" id="searchInput" placeholder="Search by song, artist, or code..." 
-                       class="search-input w-full py-4 pl-14 pr-6 rounded-2xl text-lg shadow-lg">
-            </div>
-            <!-- Genre Chips -->
-            <div class="flex flex-wrap justify-center gap-3" id="genreFilters">
-                <button class="filter-chip active px-5 py-2 rounded-full font-medium text-sm" data-genre="all">All</button>
-                <button class="filter-chip px-5 py-2 rounded-full font-medium text-sm" data-genre="gospel">Gospel</button>
-                <button class="filter-chip px-5 py-2 rounded-full font-medium text-sm" data-genre="bongo">Bongo</button>
-                <button class="filter-chip px-5 py-2 rounded-full font-medium text-sm" data-genre="afrobeat">Afrobeat</button>
-                <button class="filter-chip px-5 py-2 rounded-full font-medium text-sm" data-genre="reggea">Reggae</button>
+            <div class="relative w-full group"><i class='bx bx-search absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400 group-focus-within:text-violet-500 transition-colors'></i><input type="text" x-model="searchQuery" @input.debounce.300ms="applyFilters()" placeholder="Search by song, artist, or code..." class="search-input w-full py-4 pl-14 pr-6 rounded-2xl text-lg shadow-lg"></div>
+            <div class="flex flex-wrap justify-center gap-3">
+                <button @click="setActiveGenre('all')" :class="{ 'active': activeGenre === 'all' }" class="filter-chip px-5 py-2 rounded-full font-medium text-sm">All</button>
+                <button @click="setActiveGenre('Gospel')" :class="{ 'active': activeGenre === 'Gospel' }" class="filter-chip px-5 py-2 rounded-full font-medium text-sm">Gospel</button>
+                <button @click="setActiveGenre('Bongo')" :class="{ 'active': activeGenre === 'Bongo' }" class="filter-chip px-5 py-2 rounded-full font-medium text-sm">Bongo</button>
+                <button @click="setActiveGenre('Afrobeat')" :class="{ 'active': activeGenre === 'Afrobeat' }" class="filter-chip px-5 py-2 rounded-full font-medium text-sm">Afrobeat</button>
+                <button @click="setActiveGenre('Somali')" :class="{ 'active': activeGenre === 'Somali' }" class="filter-chip px-5 py-2 rounded-full font-medium text-sm">Somali</button>
+                <button @click="setActiveGenre('Other')" :class="{ 'active': activeGenre === 'Other' }" class="filter-chip px-5 py-2 rounded-full font-medium text-sm">Other</button>
             </div>
         </div>
     </header>
 
-    <!-- Main Track Grid -->
     <main class="container mx-auto px-4 pb-24 flex-grow">
         <div id="trackGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            
-            <!-- 
-              GO TEMPLATE NOTE: 
-              Replace the dummy data below with your loop.
-              Ensure your backend provides: Title, Artist, Genre, SkizaCode, and optionally AudioURL/CoverURL.
-            -->
-
-            <!-- Example Sonic Card 1 (Playing State Demo) -->
             {{range .AllTracks}}
-            <div class="track-card glass p-5 tilt-element" data-genre="afrobeat" data-search="city boys burna boy">
-                <!-- Cover Art & Play -->
+            <div class="track-card glass p-5 tilt-element" 
+                 :class="{ 'playing': currentTrack.id === {{.ID}} }"
+                 x-show="isItemVisible($el)" 
+                 x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                 data-id="{{.ID}}" data-genre="{{.Genre}}" data-search="{{.TrackTitle}} {{.ArtistName}} {{.TrackCode}}">
+                
                 <div class="cover-art-wrapper rounded-xl mb-5">
-                    <!-- Replace with <img src="{{.TrackAvatar}}"> if you have real art -->
-                    <div class="w-full h-full flex items-center justify-center">
-                        <!-- <i class='bx bxs-music text-6xl text-white opacity-20'></i -->
-                        {{if .TrackAvatar}}
-                        <img src="/media/{{.TrackAvatar}}">
-                        {{else}}
-                         <i class='bx bxs-music text-6xl text-white opacity-20'></i>   
-                        {{end}}
-                    </div>
-                    
-                    <!-- Audio Element (Hidden) -->
-                    <audio class="track-audio" src="/{{.TrackPath}}" preload="none"></audio>
-
-                    <div class="play-overlay" onclick="togglePlay(this.closest('.track-card'))">
-                        <div class="play-btn">
-                            <i class='bx bx-play pl-1 play-icon'></i>
-                            <i class='bx bx-pause pause-icon hidden'></i>
+                    {{if .TrackAvatar}}
+                        <img src="/media/{{.TrackAvatar}}" alt="{{.TrackTitle}}" class="w-full h-full object-cover">
+                    {{else}}
+                        <div class="w-full h-full flex items-center justify-center bg-control">
+                            <i class='bx bxs-music text-6xl text-secondary'></i>
                         </div>
+                    {{end}}
+                    <div class="play-overlay" @click="playTrack({ id: {{.ID}}, title: `{{.TrackTitle}}`, artist: `{{.ArtistName}}`, code: `{{.TrackCode}}`, icon: `{{if .TrackAvatar}}/media/{{.TrackAvatar}}{{end}}`, src: `/{{.TrackPath}}` })">
+                        <div class="play-btn"><i class='bx' :class="isPlaying && currentTrack.id === {{.ID}} ? 'bx-pause' : 'bx-play pl-1'"></i></div>
                     </div>
                 </div>
-
-                <!-- Info -->
-                <div class="mb-4">
-                    <div class="flex items-center justify-between mb-1">
-                        <span class="text-xs font-bold uppercase tracking-wider text-cyan-500">{{.Genre}}</span>
-                        <!-- Visualizer (Appears when playing) -->
-                        <div class="visualizer">
-                            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
-                        </div>
-                    </div>
-                    <h3 class="text-xl font-bold truncate" style="color: var(--text-primary);">{{.TrackTitle}}</h3>
-                    <p class="text-sm truncate" style="color: var(--text-secondary);">{{.ArtistName}}</p>
-                </div>
-
-                <!-- Action Area -->
-                <div class="flex items-center justify-between pt-4 border-t border-color">
-                    <!-- <div class="skiza-badge px-3 py-1.5 rounded-lg text-sm font-bold" style="color: var(--text-primary);">
-                        #<span class="select-all">812001</span>
-                    </div> -->
-                    <button class="bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 text-white p-2 rounded-full shadow-lg transition-all hover:scale-110 hover:shadow-violet-500/50" title="Subscribe Info">
-                        <i class='bx bx-dialpad-alt text-xl'></i>
-                    </button>
-                </div>
+                <div class="mb-4"><span class="text-xs font-bold uppercase tracking-wider" style="color: var(--secondary-glow);">{{.Genre}}</span><h3 class="text-xl font-bold truncate" style="color: var(--text-primary);">{{.TrackTitle}}</h3><p class="text-sm truncate" style="color: var(--text-secondary);">{{.ArtistName}}</p></div>
+                <div class="flex items-center justify-between pt-4 border-t border-color"><div class="font-mono text-sm font-bold p-2 rounded-lg" style="color: var(--text-primary);">CODE: {{.TrackCode}}</div><button @click="openSubModal({ title: `{{.TrackTitle}}`, artist: `{{.ArtistName}}`, code: `{{.TrackCode}}` })" class="bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 text-white p-2 rounded-full shadow-lg transition-all hover:scale-110 hover:shadow-violet-500/50" title="Subscribe"><i class='bx bx-dialpad-alt text-xl'></i></button></div>
             </div>
+            {{else}}
+            <p class="text-center text-secondary col-span-full">No tracks available at the moment.</p>
             {{end}}
-
-            <!-- Example Sonic Card 2 -->
-            <!-- <div class="track-card glass p-5 tilt-element" data-genre="gospel" data-search="imenibamba evelyn wanjiru">
-                <div class="cover-art-wrapper rounded-xl mb-5" style="background: linear-gradient(135deg, #f59e0b, #ea580c);">
-                    <div class="w-full h-full flex items-center justify-center"><i class='bx bxs-church text-6xl text-white opacity-20'></i></div>
-                    <audio class="track-audio" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" preload="none"></audio>
-                    <div class="play-overlay" onclick="togglePlay(this.closest('.track-card'))">
-                        <div class="play-btn"><i class='bx bx-play pl-1 play-icon'></i><i class='bx bx-pause pause-icon hidden'></i></div>
-                    </div>
-                </div>
-                <div class="mb-4">
-                    <div class="flex items-center justify-between mb-1">
-                        <span class="text-xs font-bold uppercase tracking-wider text-amber-500">Gospel</span>
-                        <div class="visualizer"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
-                    </div>
-                    <h3 class="text-xl font-bold truncate" style="color: var(--text-primary);">Imenibamba</h3>
-                    <p class="text-sm truncate" style="color: var(--text-secondary);">Evelyn Wanjiru</p>
-                </div>
-                <div class="flex items-center justify-between pt-4 border-t border-color">
-                    <div class="skiza-badge px-3 py-1.5 rounded-lg text-sm font-bold" style="color: var(--text-primary);">#<span class="select-all">705542</span></div>
-                    <button class="bg-gradient-to-r from-violet-600 to-cyan-600 text-white p-2 rounded-full shadow-lg transition-all hover:scale-110 hover:shadow-violet-500/50"><i class='bx bx-dialpad-alt text-xl'></i></button>
-                </div>
-            </div>
-
-            Example Sonic Card 3 (Featured) 
-            <div class="track-card glass p-5 tilt-element ring-1 ring-violet-500/50" data-genre="bongo" data-search="yatapita diamond platnumz">
-                 Featured Tag 
-                <div class="absolute top-0 right-5">
-                    <div class="bg-violet-600 text-white text-xs font-bold px-3 py-1 rounded-b-lg shadow-lg">Featured</div>
-                </div>
-                <div class="cover-art-wrapper rounded-xl mb-5" style="background: linear-gradient(135deg, #ec4899, #8b5cf6);">
-                    <div class="w-full h-full flex items-center justify-center"><i class='bx bxs-hot text-6xl text-white opacity-20'></i></div>
-                    <audio class="track-audio" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" preload="none"></audio>
-                    <div class="play-overlay" onclick="togglePlay(this.closest('.track-card'))">
-                        <div class="play-btn"><i class='bx bx-play pl-1 play-icon'></i><i class='bx bx-pause pause-icon hidden'></i></div>
-                    </div>
-                </div>
-                <div class="mb-4">
-                    <div class="flex items-center justify-between mb-1">
-                        <span class="text-xs font-bold uppercase tracking-wider text-pink-500">Bongo</span>
-                        <div class="visualizer"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
-                    </div>
-                    <h3 class="text-xl font-bold truncate" style="color: var(--text-primary);">Yatapita</h3>
-                    <p class="text-sm truncate" style="color: var(--text-secondary);">Diamond Platnumz</p>
-                </div>
-                <div class="flex items-center justify-between pt-4 border-t border-color">
-                    <div class="skiza-badge px-3 py-1.5 rounded-lg text-sm font-bold" style="color: var(--text-primary);">#<span class="select-all">909101</span></div>
-                    <button class="bg-gradient-to-r from-violet-600 to-cyan-600 text-white p-2 rounded-full shadow-lg transition-all hover:scale-110 hover:shadow-violet-500/50"><i class='bx bx-dialpad-alt text-xl'></i></button>
-                </div>
-            </div> -->
-            <!-- END GO TEMPLATE RANGE -->
-
         </div>
-
-        <!-- Minimal Pagination (Optional) -->
-        <div class="flex justify-center mt-16 gap-4">
-            <button class="glass px-6 py-3 rounded-full text-var(--text-secondary) hover:text-var(--primary-glow) hover:border-violet-500 transition-all flex items-center gap-2 disabled:opacity-50 cursor-pointer">
-                <i class='bx bx-left-arrow-alt text-xl'></i> Previous
-            </button>
-            <button class="glass px-6 py-3 rounded-full text-var(--text-secondary) hover:text-var(--primary-glow) hover:border-violet-500 transition-all flex items-center gap-2 cursor-pointer">
-                Next <i class='bx bx-right-arrow-alt text-xl'></i>
-            </button>
+        
+        <div x-show="totalPages > 1" class="flex justify-center items-center mt-16 gap-2 flex-wrap" x-cloak>
+            <button @click="goToPage(1)" :disabled="currentPage === 1" class="pagination-btn h-10 w-10 flex items-center justify-center rounded-full"><i class='bx bx-chevrons-left text-2xl'></i></button>
+            <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 1" class="pagination-btn h-10 w-10 flex items-center justify-center rounded-full"><i class='bx bx-chevron-left text-2xl'></i></button>
+            <template x-for="page in pages" :key="page">
+                <button @click="goToPage(page)" :class="{ 'active': currentPage === page, 'hidden': typeof page === 'string'}" x-text="page" class="pagination-btn h-10 w-10 rounded-full font-semibold"></button>
+            </template>
+            <template x-for="page in pages" :key="page"><span x-show="typeof page === 'string'" x-text="page" class="h-10 w-10 flex items-center justify-center text-secondary"></span></template>
+            <button @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages" class="pagination-btn h-10 w-10 flex items-center justify-center rounded-full"><i class='bx bx-chevron-right text-2xl'></i></button>
+            <button @click="goToPage(totalPages)" :disabled="currentPage === totalPages" class="pagination-btn h-10 w-10 flex items-center justify-center rounded-full"><i class='bx bx-chevrons-right text-2xl'></i></button>
         </div>
     </main>
 
-    <footer class="glass border-t border-color py-8 text-center text-sm" style="color: var(--text-secondary);">
-        <div class="container mx-auto">
-            <p>&copy; 2024 Lamahuraancomm. The heartbeat of Skiza.</p>
+    <footer class="glass border-t border-color py-8 text-center text-sm" style="color: var(--text-secondary);"><p>&copy; 2024 Lamahuraancomm. The heartbeat of Skiza.</p></footer>
+
+    <div x-show="isSubModalOpen" x-transition.opacity class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" x-cloak><div @click.outside="isSubModalOpen = false" x-show="isSubModalOpen" x-transition class="glass rounded-xl shadow-2xl w-full max-w-md p-8"><div class="flex justify-between items-start mb-4"><h3 class="text-2xl font-bold text-primary" x-text="subModalData.title"></h3><button @click="isSubModalOpen = false" class="text-secondary hover:text-primary text-2xl">&times;</button></div><p class="text-secondary -mt-4" x-text="subModalData.artist"></p><div class="text-center bg-control rounded-lg p-3 my-4"><p class="text-secondary text-sm">SKIZA CODE</p><p class="text-2xl font-mono font-bold tracking-widest text-primary" x-text="subModalData.code"></p></div><form action="/subscribe" method="post"><input type="hidden" name="skiza_code" :value="subModalData.code"><div><label for="phone_number" class="text-sm font-medium text-secondary mb-1 block">Your Phone Number</label><input type="tel" name="phone_number" id="phone_number" placeholder="07XX XXX XXX" required class="search-input w-full py-3 px-4 rounded-lg text-lg"></div><button type="submit" class="w-full mt-6 bg-gradient-to-r from-violet-600 to-cyan-600 text-white font-bold py-3 rounded-lg hover:scale-105 transition-transform">Subscribe Now</button></form></div></div>
+    
+    <div x-show="currentTrack.src" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="translate-y-0" x-transition:leave-end="translate-y-full" class="fixed bottom-0 left-0 right-0 z-50 glass border-t border-color" x-cloak>
+        <audio x-ref="audioPlayer" @timeupdate="updateProgress()" @loadedmetadata="onLoadedMetadata()" @ended="onEnded()"></audio>
+        <div class="container mx-auto px-4 py-3 grid grid-cols-3 items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-14 h-14 rounded-md bg-control border border-color flex-shrink-0 flex items-center justify-center">
+                    <template x-if="currentTrack.icon"><img :src="currentTrack.icon" class="w-full h-full object-cover rounded-md"></template>
+                    <template x-if="!currentTrack.icon"><i class='bx bxs-music text-3xl text-secondary'></i></template>
+                </div>
+                <div class="hidden md:block"><p class="font-bold text-primary truncate" x-text="currentTrack.title"></p><p class="text-sm text-secondary truncate" x-text="currentTrack.artist"></p></div>
+            </div>
+            <div class="flex flex-col items-center"><div class="flex items-center gap-4"><button @click="playPrev()" class="text-2xl text-secondary hover:text-primary transition-colors"><i class='bx bx-skip-previous'></i></button><button @click="togglePlayPause()" class="w-12 h-12 rounded-full bg-primary-glow text-white text-3xl flex items-center justify-center hover:scale-105 transition-transform"><i class='bx' :class="isPlaying ? 'bx-pause' : 'bx-play'"></i></button><button @click="playNext()" class="text-2xl text-secondary hover:text-primary transition-colors"><i class='bx bx-skip-next'></i></button></div><div class="w-full max-w-sm flex items-center gap-2 mt-2"><span class="text-xs text-secondary font-mono" x-text="currentTime"></span><input type="range" x-model="progress" @input="seekAudio($event.target.value)" class="w-full"><span class="text-xs text-secondary font-mono" x-text="duration"></span></div></div>
+            <div class="flex items-center justify-end gap-3"><div class="hidden md:flex items-center gap-2 w-32"><button @click="toggleMute()"><i class='bx text-2xl text-secondary hover:text-primary' :class="volume > 0 ? 'bxs-volume-full' : 'bxs-volume-mute'"></i></button><input type="range" min="0" max="1" step="0.01" x-model="volume" @input="setVolume($event.target.value)"></div><button @click="closePlayer()" class="text-2xl text-secondary hover:text-primary"><i class='bx bx-x'></i></button></div>
         </div>
-    </footer>
+    </div>
 
-    <!-- INTERACTIVITY SCRIPTS -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            
-            // 1. THEME TOGGLE LOGIC
-            const themeToggle = document.getElementById('theme-toggle');
-            const html = document.documentElement;
-            const lightIcon = themeToggle.querySelector('.light-icon');
-            const darkIcon = themeToggle.querySelector('.dark-icon');
-
-            function applyTheme(theme) {
-                html.setAttribute('data-theme', theme);
-                localStorage.setItem('theme', theme);
-                if (theme === 'dark') {
-                    lightIcon.classList.remove('hidden'); darkIcon.classList.add('hidden');
-                } else {
-                    lightIcon.classList.add('hidden'); darkIcon.classList.remove('hidden');
-                }
-            }
-
-            // Init theme
-            const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-            applyTheme(savedTheme);
-
-            themeToggle.addEventListener('click', () => {
-                const current = html.getAttribute('data-theme');
-                applyTheme(current === 'dark' ? 'light' : 'dark');
-            });
-
-            // 2. AUDIO PLAYER LOGIC (Single Source of Truth)
-            let currentAudio = null;
-            let currentCard = null;
-
-            window.togglePlay = function(card) {
-                const audio = card.querySelector('.track-audio');
-                const playIcon = card.querySelector('.play-icon');
-                const pauseIcon = card.querySelector('.pause-icon');
-
-                // If clicking a different track, stop the current one
-                if (currentAudio && currentAudio !== audio) {
-                    currentAudio.pause();
-                    currentAudio.currentTime = 0;
-                    currentCard.classList.remove('playing');
-                    currentCard.querySelector('.play-icon').classList.remove('hidden');
-                    currentCard.querySelector('.pause-icon').classList.add('hidden');
-                }
-
-                if (audio.paused) {
-                    // Play this track
-                    // Note: In production, ensure AudioURL is valid.
-                    audio.volume = 0.5; // Start not too loud
-                    const playPromise = audio.play();
-                    
-                    if (playPromise !== undefined) {
-                        playPromise.then(_ => {
-                            card.classList.add('playing');
-                            playIcon.classList.add('hidden');
-                            pauseIcon.classList.remove('hidden');
-                            currentAudio = audio;
-                            currentCard = card;
-                        })
-                        .catch(error => {
-                            console.error("Playback failed (likely dummy URL):", error);
-                            alert("Preview unavailable for this demo track.");
-                        });
-                    }
-
-                } else {
-                    // Pause this track
-                    audio.pause();
-                    card.classList.remove('playing');
-                    playIcon.classList.remove('hidden');
-                    pauseIcon.classList.add('hidden');
-                    currentAudio = null;
-                    currentCard = null;
-                }
-
-                // Reset on end
-                audio.onended = () => {
-                    card.classList.remove('playing');
-                    playIcon.classList.remove('hidden');
-                    pauseIcon.classList.add('hidden');
-                    currentAudio = null;
-                };
-            };
-
-
-            // 3. SEARCH & FILTER LOGIC (Client-side Demo)
-            const searchInput = document.getElementById('searchInput');
-            const genreBtns = document.querySelectorAll('#genreFilters button');
-            const cards = document.querySelectorAll('.track-card');
-            let activeGenre = 'all';
-
-            function filterTracks() {
-                const query = searchInput.value.toLowerCase();
+        function pageController() {
+            return {
+                theme: 'dark', isSubModalOpen: false, subModalData: {}, searchQuery: '', activeGenre: 'all', currentPage: 1, itemsPerPage: 8,
+                audioPlayer: null, currentTrack: { id: null, src: null }, isPlaying: false, progress: 0, volume: 0.75, duration: '0:00', currentTime: '0:00',
                 
-                cards.forEach(card => {
-                    const cardGenre = card.dataset.genre;
-                    const cardSearchData = card.dataset.search;
-                    
-                    const matchesGenre = activeGenre === 'all' || cardGenre === activeGenre;
-                    const matchesSearch = cardSearchData.includes(query);
-
-                    if (matchesGenre && matchesSearch) {
-                        card.style.display = 'block';
-                        // Optional: Add fade-in animation here
-                    } else {
-                        card.style.display = 'none';
+                init() {
+                    this.setTheme(localStorage.getItem('theme') || 'dark');
+                    this.$nextTick(() => {
+                        this.audioPlayer = this.$refs.audioPlayer;
+                        this.audioPlayer.volume = this.volume;
+                        this.initTilt();
+                    });
+                },
+                setTheme(t) { this.theme = t; document.documentElement.setAttribute('data-theme', t); localStorage.setItem('theme', t); },
+                toggleTheme() { this.setTheme(this.theme === 'dark' ? 'light' : 'dark'); },
+                
+                playTrack(trackData) {
+                    if (this.currentTrack.id === trackData.id) { this.togglePlayPause(); } 
+                    else {
+                        this.currentTrack = trackData;
+                        this.audioPlayer.src = this.currentTrack.src;
+                        this.audioPlayer.play().then(() => this.isPlaying = true).catch(e => { console.error("Audio error:", e); alert("Audio preview for this track could not be loaded."); });
                     }
-                });
+                },
+                togglePlayPause() { if (!this.currentTrack.src) return; this.audioPlayer.paused ? this.audioPlayer.play().then(()=>this.isPlaying = true) : (this.audioPlayer.pause(), this.isPlaying = false); },
+                playNext() { const list = this.filteredItems; const idx = list.findIndex(el => el.dataset.id == this.currentTrack.id); const nextItem = list[idx + 1] || list[0]; if (nextItem) { this.playTrack(this.getTrackDataFromEl(nextItem)); }},
+                playPrev() { const list = this.filteredItems; const idx = list.findIndex(el => el.dataset.id == this.currentTrack.id); const prevItem = list[idx - 1] || list[list.length - 1]; if (prevItem) { this.playTrack(this.getTrackDataFromEl(prevItem)); }},
+                getTrackDataFromEl(el) {
+                    const iconEl = el.querySelector('img');
+                    return {
+                        id: el.dataset.id,
+                        title: el.querySelector('h3').textContent,
+                        artist: el.querySelector('p').textContent,
+                        code: el.querySelector('.font-mono').textContent.replace('CODE: ',''),
+                        icon: iconEl ? iconEl.src : '',
+                        src: el.querySelector('.play-overlay').nextElementSibling.src
+                    };
+                },
+                updateProgress() { this.progress = (this.audioPlayer.currentTime / this.audioPlayer.duration) * 100 || 0; this.currentTime = this.formatTime(this.audioPlayer.currentTime); },
+                onLoadedMetadata() { this.duration = this.formatTime(this.audioPlayer.duration); },
+                onEnded() { this.isPlaying = false; this.playNext(); },
+                seekAudio(val) { this.audioPlayer.currentTime = (val / 100) * this.audioPlayer.duration; },
+                setVolume(val) { this.audioPlayer.volume = val; },
+                toggleMute() { this.volume = this.volume > 0 ? 0 : 0.75; this.setVolume(this.volume); },
+                closePlayer() { this.audioPlayer.pause(); this.isPlaying = false; this.currentTrack = { id: null, src: null }; },
+                formatTime(s) { if(isNaN(s)) return '0:00'; const m=Math.floor(s/60); const sc=Math.floor(s%60).toString().padStart(2,'0'); return `${m}:${sc}`; },
+
+                get filteredItems() { const q = this.searchQuery.toLowerCase(); return Array.from(document.querySelectorAll('.track-card')).filter(c => (this.activeGenre === 'all' || c.dataset.genre === this.activeGenre) && c.dataset.search.toLowerCase().includes(q)); },
+                get totalPages() { return Math.ceil(this.filteredItems.length / this.itemsPerPage); },
+                get pages() {
+                    const total = this.totalPages; const current = this.currentPage;
+                    if (total <= 7) { return Array.from({ length: total }, (_, i) => i + 1); }
+                    if (current <= 4) { return [1, 2, 3, 4, 5, '...', total]; }
+                    if (current > total - 4) { return [1, '...', total - 4, total - 3, total - 2, total - 1, total]; }
+                    return [1, '...', current - 1, current, current + 1, '...', total];
+                },
+                isItemVisible(el) { const i = this.filteredItems.indexOf(el); const s = (this.currentPage - 1) * this.itemsPerPage; return i >= s && i < s + this.itemsPerPage; },
+                applyFilters() { this.currentPage = 1; },
+                setActiveGenre(g) { this.activeGenre = g; this.applyFilters(); },
+                goToPage(p) { if (typeof p === 'number' && p > 0 && p <= this.totalPages) { this.currentPage = p; document.getElementById('page-header').scrollIntoView({ behavior: 'smooth' }); } },
+                openSubModal(data) { this.subModalData = data; this.isSubModalOpen = true; },
+                
+                initTilt() { document.querySelectorAll('.tilt-element').forEach(el => { el.addEventListener('mousemove', e => { const r = el.getBoundingClientRect(); const tX=(e.clientX-(r.left+r.width/2))/(r.width/2); const tY=(e.clientY-(r.top+r.height/2))/(r.height/2); el.style.transform = `perspective(1000px) rotateX(${tY*8}deg) rotateY(${-tX*8}deg) scale3d(1.02, 1.02, 1.02)`; }); el.addEventListener('mouseleave', () => { el.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)'; }); }); }
             }
-
-            searchInput.addEventListener('input', filterTracks);
-
-            genreBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    // Update active state
-                    genreBtns.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    activeGenre = btn.dataset.genre;
-                    filterTracks();
-                });
-            });
-
-
-            // 4. SMOOTH 3D TILT EFFECT (Reused from Admin)
-            const tiltElements = document.querySelectorAll('.tilt-element');
-            tiltElements.forEach(el => {
-                let targetX = 0, targetY = 0, currentX = 0, currentY = 0;
-                const smoothing = 0.1; // Snappier than admin
-
-                function updateTilt() {
-                    currentX += (targetX - currentX) * smoothing;
-                    currentY += (targetY - currentY) * smoothing;
-                    // Subtler tilt for grid items
-                    const xDeg = currentY * 8; 
-                    const yDeg = -currentX * 8;
-                    
-                    if (Math.abs(targetX - currentX) > 0.001 || Math.abs(targetY - currentY) > 0.001) {
-                         el.style.transform = `perspective(1000px) rotateX(${xDeg}deg) rotateY(${yDeg}deg) scale3d(1.02, 1.02, 1.02)`;
-                         requestAnimationFrame(updateTilt);
-                    } else {
-                        // Stop animation loop when settled to save resources
-                        el.style.transform = `perspective(1000px) rotateX(${xDeg}deg) rotateY(${yDeg}deg) scale3d(1.02, 1.02, 1.02)`;
-                    }
-                }
-
-                el.addEventListener('mousemove', (e) => {
-                    const rect = el.getBoundingClientRect();
-                    const centerX = rect.left + rect.width / 2;
-                    const centerY = rect.top + rect.height / 2;
-                    targetX = (e.clientX - centerX) / (rect.width / 2);
-                    targetY = (e.clientY - centerY) / (rect.height / 2);
-                    
-                    // Start animation loop if not running
-                    if (currentX === 0 && currentY === 0) requestAnimationFrame(updateTilt);
-                });
-
-                el.addEventListener('mouseleave', () => {
-                    targetX = 0; targetY = 0;
-                    el.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
-                    // Force reset currents so mousemove restarts loop
-                    setTimeout(() => { currentX = 0; currentY = 0; }, 300); 
-                });
-            });
-
-        });
+        }
     </script>
 </body>
 </html>
