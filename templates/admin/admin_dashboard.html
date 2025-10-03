@@ -1,6 +1,6 @@
 {{define "adminAnalyticsPage"}}
 <!DOCTYPE html>
-<html lang="en" data-theme="dark"> <!-- Default theme -->
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,71 +10,21 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* --- MASTER THEME DEFINITION (INSPIRED BY INDEXPAGE) --- */
         :root {
-            --primary-glow: #7c3aed;
-            --secondary-glow: #0ea5e9;
-            /* Default to Dark Mode */
-            --bg-main: #0F0F1B;
-            --bg-card: rgba(26, 26, 39, 0.6);
-            --bg-control: rgba(26, 26, 39, 0.8);
-            --bg-hover: rgba(124, 58, 237, 0.1);
-            --text-primary: #f8fafc;
-            --text-secondary: #a1a1aa;
-            --border-color: rgba(255, 255, 255, 0.1);
-            --shadow-color: rgba(0,0,0,0.2);
-            --bg-animated: radial-gradient(circle at 1% 1%, var(--primary-glow), transparent 30%),
-                           radial-gradient(circle at 99% 99%, var(--secondary-glow), transparent 35%);
+            --primary-glow: #7c3aed; --secondary-glow: #0ea5e9; --bg-main: #0F0F1B; --bg-card: rgba(26, 26, 39, 0.6);
+            --bg-control: rgba(26, 26, 39, 0.8); --bg-hover: rgba(124, 58, 237, 0.1); --text-primary: #f8fafc;
+            --text-secondary: #a1a1aa; --border-color: rgba(255, 255, 255, 0.1); --shadow-color: rgba(0,0,0,0.2);
+            --bg-animated: radial-gradient(circle at 1% 1%, var(--primary-glow), transparent 30%), radial-gradient(circle at 99% 99%, var(--secondary-glow), transparent 35%);
         }
-
         [data-theme="light"] {
-            --bg-main: #f4f4f9;
-            --bg-card: rgba(255, 255, 255, 0.6);
-            --bg-control: #ffffff;
-            --bg-hover: rgba(0, 0, 0, 0.05);
-            --text-primary: #111827;
-            --text-secondary: #6b7280;
-            --border-color: rgba(0, 0, 0, 0.08);
-            --shadow-color: rgba(0,0,0,0.1);
-            --bg-animated: radial-gradient(circle at 1% 1%, #d8b4fe, transparent 35%),
-                           radial-gradient(circle at 99% 99%, #bae6fd, transparent 40%);
+            --bg-main: #f4f4f9; --bg-card: rgba(255, 255, 255, 0.6); --bg-control: #ffffff; --bg-hover: rgba(0, 0, 0, 0.05);
+            --text-primary: #111827; --text-secondary: #6b7280; --border-color: rgba(0, 0, 0, 0.08); --shadow-color: rgba(0,0,0,0.1);
+            --bg-animated: radial-gradient(circle at 1% 1%, #d8b4fe, transparent 35%), radial-gradient(circle at 99% 99%, #bae6fd, transparent 40%);
         }
-
         @keyframes backgroundPan { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-
-        body {
-            background-color: var(--bg-main);
-            color: var(--text-primary);
-            background-image: var(--bg-animated);
-            background-size: 300% 300%;
-            animation: backgroundPan 25s ease infinite;
-            transition: background-color 0.4s ease, color 0.4s ease;
-        }
-
-        /* Component Styling using variables */
-        .bg-card { background-color: var(--bg-card); }
-        .bg-control { background-color: var(--bg-control); }
-        .bg-hover:hover { background-color: var(--bg-hover); }
-        .text-primary { color: var(--text-primary); }
-        .text-secondary { color: var(--text-secondary); }
-        .border-color { border-color: var(--border-color); }
-        .logo-text { font-weight: 900; }
-        [data-theme="dark"] .logo-text { background: linear-gradient(90deg, var(--primary-glow), var(--secondary-glow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        [data-theme="light"] .logo-text { color: var(--primary-glow); }
-
+        body { background-color: var(--bg-main); color: var(--text-primary); background-image: var(--bg-animated); background-size: 300% 300%; animation: backgroundPan 25s ease infinite; transition: background-color 0.4s ease, color 0.4s ease; }
+        .bg-card { background-color: var(--bg-card); } .text-primary { color: var(--text-primary); } .text-secondary { color: var(--text-secondary); } .border-color { border-color: var(--border-color); }
         [x-cloak] { display: none !important; }
-
-        /* Responsive Table for Mobile */
-        @media (max-width: 767px) {
-            .responsive-table thead { display: none; }
-            .responsive-table tbody, .responsive-table tr, .responsive-table td { display: block; width: 100%; }
-            .responsive-table tr { margin-bottom: 1rem; border: 1px solid var(--border-color); border-radius: 0.75rem; overflow: hidden; padding: 0.5rem 1rem 1rem 1rem; background-color: var(--bg-card); }
-            .responsive-table td { padding: 0.5rem 0; display: flex; justify-content: space-between; align-items: center; text-align: right; }
-            .responsive-table td:not(:last-child) { border-bottom: 1px solid var(--border-color); }
-            .responsive-table td.primary-cell { display: block; text-align: left; padding-bottom: 0.75rem; margin-bottom: 0.5rem; }
-            .responsive-table td::before { content: attr(data-label); font-weight: 600; text-align: left; margin-right: 1rem; color: var(--text-secondary); }
-            .responsive-table td.primary-cell::before, .responsive-table td.rank-cell::before { display: none; }
-        }
     </style>
 </head>
     
@@ -82,89 +32,89 @@
     <div id="sidebar-container" class="flex-shrink-0">{{template "staffSidebar" .}}</div>
 
     <main class="flex-1 p-4 md:p-8 overflow-y-auto">
-        <div class="mb-8"><h1 class="text-3xl font-bold text-primary pt-12 md:pt-0">Rhythm Analytics</h1><p class="text-secondary">Key metrics for your Skiza Tune catalog.</p></div>
+        <div class="mb-8"><h1 class="text-3xl font-bold text-primary pt-12 md:pt-0">Rhythm Analytics</h1><p class="text-secondary">A real-time overview of your Skiza Tune platform.</p></div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="bg-card backdrop-blur-sm p-6 rounded-xl shadow-lg border border-color flex items-center space-x-4"><div class="bg-green-500/10 p-3 rounded-full"><i class='bx bxs-dollar-circle text-2xl text-green-500'></i></div><div><p class="text-sm font-medium text-secondary">Total Revenue</p><p class="text-2xl font-bold text-primary">Ksh {{.TotalRevenue}}</p></div></div>
-            <div class="bg-card backdrop-blur-sm p-6 rounded-xl shadow-lg border border-color flex items-center space-x-4"><div class="bg-sky-500/10 p-3 rounded-full"><i class='bx bxs-user-check text-2xl text-sky-500'></i></div><div><p class="text-sm font-medium text-secondary">Active Subscribers</p><p class="text-2xl font-bold text-primary">{{.ActiveSubscribers}}</p></div></div>
-            <div class="bg-card backdrop-blur-sm p-6 rounded-xl shadow-lg border border-color flex items-center space-x-4"><div class="bg-violet-500/10 p-3 rounded-full"><i class='bx bxs-music text-2xl text-violet-500'></i></div><div><p class="text-sm font-medium text-secondary">Total Tracks</p><p class="text-2xl font-bold text-primary">{{.TotalTracks}}</p></div></div>
-            <div class="bg-card backdrop-blur-sm p-6 rounded-xl shadow-lg border border-color flex items-center space-x-4"><div class="bg-amber-500/10 p-3 rounded-full"><i class='bx bxs-trending-up text-2xl text-amber-500'></i></div><div><p class="text-sm font-medium text-secondary">New Subs (30 Days)</p><p class="text-2xl font-bold text-primary">+{{.NewSubsThisMonth}}</p></div></div>
+            <div class="bg-card backdrop-blur-sm p-6 rounded-xl shadow-lg border border-color flex items-center space-x-4"><div class="bg-sky-500/10 p-3 rounded-full"><i class='bx bxs-user-account text-2xl text-sky-400'></i></div><div><p class="text-sm font-medium text-secondary">Total Users</p><p class="text-2xl font-bold text-primary">{{.TotalUsers}}</p></div></div>
+            <div class="bg-card backdrop-blur-sm p-6 rounded-xl shadow-lg border border-color flex items-center space-x-4"><div class="bg-violet-500/10 p-3 rounded-full"><i class='bx bxs-music text-2xl text-violet-400'></i></div><div><p class="text-sm font-medium text-secondary">Total Tracks</p><p class="text-2xl font-bold text-primary">{{.TotalTracks}}</p></div></div>
+            <div class="bg-card backdrop-blur-sm p-6 rounded-xl shadow-lg border border-color flex items-center space-x-4"><div class="bg-pink-500/10 p-3 rounded-full"><i class='bx bxs-star text-2xl text-pink-400'></i></div><div><p class="text-sm font-medium text-secondary">Featured Tracks</p><p class="text-2xl font-bold text-primary">{{.FeaturedTracks}}</p></div></div>
+            <div class="bg-card backdrop-blur-sm p-6 rounded-xl shadow-lg border border-color flex items-center space-x-4"><div class="bg-amber-500/10 p-3 rounded-full"><i class='bx bxs-file-plus text-2xl text-amber-400'></i></div><div><p class="text-sm font-medium text-secondary">New This Month</p><p class="text-2xl font-bold text-primary">+{{.NewTracksThisMonth}}</p></div></div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-8">
-            <div class="lg:col-span-3 bg-card backdrop-blur-sm p-4 md:p-6 rounded-xl shadow-lg border border-color"><h2 class="text-lg font-semibold text-primary mb-4">Monthly Revenue (Ksh)</h2><div><canvas id="revenueChart"></canvas></div></div>
-            <div class="lg:col-span-2 bg-card backdrop-blur-sm p-4 md:p-6 rounded-xl shadow-lg border border-color"><h2 class="text-lg font-semibold text-primary mb-4">Genre Distribution</h2><div class="max-h-80 mx-auto"><canvas id="genreChart"></canvas></div></div>
-        </div>
-        
-        <div class="bg-card backdrop-blur-sm p-4 md:p-6 rounded-xl shadow-lg border border-color">
-            <h2 class="text-lg font-semibold mb-4 text-primary">Top Performing Skiza Tunes</h2>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left responsive-table">
-                    <thead><tr><th class="p-3 text-sm font-semibold text-secondary">#</th><th class="p-3 text-sm font-semibold text-secondary">Track</th><th class="p-3 text-sm font-semibold text-secondary">Skiza Code</th><th class="p-3 text-sm font-semibold text-secondary">Subscribers</th><th class="p-3 text-sm font-semibold text-secondary">Revenue (30d)</th></tr></thead>
-                    <tbody>
-                        {{range .TopTracks}}
-                        <tr class="hover:bg-hover">
-                            <td class="p-3 font-bold text-secondary rank-cell"></td>
-                            <td class="p-3 primary-cell"><p class="font-semibold text-primary">{{.Title}}</p><p class="text-xs text-secondary">{{.Artist}}</p></td>
-                            <td class="p-3" data-label="Skiza Code"><span class="px-2 py-1 text-xs font-mono rounded bg-gray-500/10 text-secondary">{{.SkizaCode}}</span></td>
-                            <td class="p-3 font-medium text-primary" data-label="Subscribers">{{.Subscribers}}</td>
-                            <td class="p-3 font-semibold text-green-500" data-label="Revenue (30d)">Ksh {{.MonthlyRevenue}}</td>
-                        </tr>
-                        {{else}}
-                        <tr><td colspan="5" class="p-4 text-center text-secondary">No tracks found.</td></tr>
-                        {{end}}
-                    </tbody>
-                </table>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Genre Chart -->
+            <div class="lg:col-span-1 bg-card backdrop-blur-sm p-4 md:p-6 rounded-xl shadow-lg border border-color">
+                <h2 class="text-lg font-semibold text-primary mb-4">Top 5 Genres</h2>
+                <div class="max-h-80 mx-auto"><canvas id="genreChart"></canvas></div>
+            </div>
+            
+            <!-- Live Subscription Feed -->
+            <div x-data="liveFeed()" x-init="init()" class="lg:col-span-2 bg-card backdrop-blur-sm p-4 md:p-6 rounded-xl shadow-lg border border-color">
+                <div class="flex items-center gap-3 mb-4">
+                    <h2 class="text-lg font-semibold text-primary">Live Subscription Feed</h2>
+                    <span class="flex h-3 w-3 relative"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span>
+                </div>
+                <div class="space-y-3">
+                    <template x-for="sub in visibleSubscriptions" :key="sub.ID">
+                        <div x-show="true" x-transition:enter="transition ease-out duration-500" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
+                             class="flex items-start gap-3 p-3 rounded-md bg-control border border-color">
+                            <i class='bx bx-check-circle text-xl text-green-400 mt-0.5'></i>
+                            <div>
+                                <p class="text-sm font-medium text-primary" x-text="`Subscribed to #${sub.ProductCode}`"></p>
+                                <p class="text-xs text-secondary" x-text="sub.CustomerMessage"></p>
+                            </div>
+                        </div>
+                    </template>
+                    <div x-show="allSubscriptions.length === 0" class="text-center text-secondary py-8">Awaiting new subscriptions...</div>
+                </div>
             </div>
         </div>
     </main>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.rank-cell').forEach((cell, index) => { cell.textContent = index + 1; });
-
-            let revenueChartInstance = null;
             let genreChartInstance = null;
-
             function renderCharts() {
-                const currentTheme = document.documentElement.getAttribute('data-theme');
-                const isDarkMode = currentTheme === 'dark';
-                const chartOptions = {
-                    color: isDarkMode ? '#a1a1aa' : '#6b7280',
-                    gridColor: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
-                    tooltipBg: isDarkMode ? '#1a1a27' : '#ffffff',
-                    tooltipTitle: isDarkMode ? '#f8fafc' : '#111827',
-                    tooltipBody: isDarkMode ? '#a1a1aa' : '#6b7280'
-                };
-
-                if (revenueChartInstance) revenueChartInstance.destroy();
+                const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+                const chartOptions = { color: isDarkMode ? '#a1a1aa' : '#6b7280', tooltipBg: isDarkMode ? '#1a1a27' : '#ffffff', tooltipTitle: isDarkMode ? '#f8fafc' : '#111827' };
                 if (genreChartInstance) genreChartInstance.destroy();
-
-                const revenueCtx = document.getElementById('revenueChart');
-                if (revenueCtx) {
-                    revenueChartInstance = new Chart(revenueCtx, { /* ... chart config ... */ });
-                }
-
                 const genreCtx = document.getElementById('genreChart');
                 if (genreCtx) {
-                    genreChartInstance = new Chart(genreCtx, { /* ... chart config ... */ });
+                    try {
+                        const genreLabels = {{.GenreDistributionLabels}};
+                        const genreData = {{.GenreDistributionData}};
+                        genreChartInstance = new Chart(genreCtx, {
+                            type: 'doughnut', data: { labels: genreLabels, datasets: [{ label: 'Tracks', data: genreData, backgroundColor: ['#8b5cf6', '#ec4899', '#3b82f6', '#f59e0b', '#10b981'], borderColor: isDarkMode ? '#0F0F1B' : '#f4f4f9', borderWidth: 4, hoverOffset: 10 }] },
+                            options: { responsive: true, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { color: chartOptions.color, boxWidth: 15, padding: 20 } }, tooltip: { backgroundColor: chartOptions.tooltipBg, titleColor: chartOptions.tooltipTitle, bodyColor: chartOptions.color, padding: 10 } } }
+                        });
+                    } catch (e) { console.error("Failed to render genre chart. Check if Go template variables are properly defined and exported:", e); }
                 }
             }
-            
-            const observer = new MutationObserver((mutations) => {
-                mutations.forEach(mutation => {
-                    if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
-                        renderCharts();
-                    }
-                });
-            });
+            const observer = new MutationObserver((mutations) => mutations.forEach(m => { if (m.type === 'attributes' && m.attributeName === 'data-theme') renderCharts(); }));
             observer.observe(document.documentElement, { attributes: true });
-
-            renderCharts(); // Initial render
+            renderCharts();
         });
-        
-        // Simplified chart configs for brevity
-        Chart.prototype.constructor.defaults.font.family = "'Inter', sans-serif";
+
+        function liveFeed() {
+            return {
+                allSubscriptions: {{.RecentSubscriptionsJS}},
+                visibleSubscriptions: [],
+                currentIndex: 0,
+                init() {
+                    if (!Array.isArray(this.allSubscriptions) || this.allSubscriptions.length === 0) return;
+                    setTimeout(() => {
+                        this.showNext();
+                        setInterval(() => this.showNext(), 4000);
+                    }, 1000);
+                },
+                showNext() {
+                    const nextSub = this.allSubscriptions[this.currentIndex % this.allSubscriptions.length];
+                    this.visibleSubscriptions.unshift(nextSub);
+                    if (this.visibleSubscriptions.length > 5) this.visibleSubscriptions.pop();
+                    this.currentIndex++;
+                }
+            }
+        }
     </script>
 </body>
 </html>

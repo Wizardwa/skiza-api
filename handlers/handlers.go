@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"fmt"
-	_"html/template"
+	"html/template"
 	_ "middlewares/auth"
 	"models"
 	"net/http"
@@ -29,7 +29,7 @@ import (
 	_"errors"
 	_"net/url"
 	_"sort"
-	_"time"
+	"time"
 	_"math/rand"
 	_"encoding/csv"
 	_"github.com/xuri/excelize/v2"
@@ -85,6 +85,25 @@ type SessionResponse struct {
 	Body Body `json:"body"`
 }
 
+type ConsentRedirect struct {
+	RedirectURL string
+}
+
+
+type AnalyticsData struct {
+	TotalUsers         int64
+	TotalTracks        int64
+	FeaturedTracks     int64
+	NewTracksThisMonth int64
+	// This field is not used in the final template, but kept for context
+	RecentSubscriptions []models.SessionIdResponse 
+
+	// Fields for JavaScript (must be template.JS type)
+	GenreDistributionLabels template.JS
+	GenreDistributionData   template.JS
+	RecentSubscriptionsJS   template.JS // <-- ADD THIS FIELD
+}
+
 
 func GetAccessToken() string {
 	skizaKey := os.Getenv("skiza_key")
@@ -110,7 +129,7 @@ func GetAccessToken() string {
 	return body.AccessToken
 }
 
-func GetSessionID(h *Handler,phone string, skizaCode string) {
+func GetSessionID(h *Handler,phone string, skizaCode string) string {
 	token := GetAccessToken()
 	url := "https://api.safaricom.co.ke/v1/skizasession/id"
 	payload := map[string]interface{}{
@@ -157,6 +176,8 @@ func GetSessionID(h *Handler,phone string, skizaCode string) {
 	if err := h.DB.Create(&sess).Error; err != nil {
 		fmt.Println("Failed to create session response record")
 	}
+
+	return body.Body.RedirectURL
 }
 
 func formatNumber(number string) string {
@@ -183,7 +204,22 @@ func (h *Handler) HomeHandler(w http.ResponseWriter, r *http.Request) {
 			}else{
 				//call api endpoints
 				parsedPhone := formatNumber(phoneNumber)
-				GetSessionID(h,parsedPhone, tracks.TrackCode)
+				redirectUrl := GetSessionID(h,parsedPhone, tracks.TrackCode)
+
+				jsonResponse := ConsentRedirect{
+					RedirectURL : redirectUrl,
+				}
+
+				responseBody, err := json.Marshal(jsonResponse)
+				if err != nil {
+					fmt.Println("Failed to marshal json response!")
+				}
+
+				w.Header().Set("Content-Type", "application/json")
+			    w.WriteHeader(http.StatusOK)
+			    w.Write(responseBody)
+
+			    return
 			}
 			
 
@@ -204,8 +240,55 @@ func (h *Handler) HomeHandler(w http.ResponseWriter, r *http.Request) {
 
 
 //admin
-func(h *Handler) AdminDashHandler(w http.ResponseWriter, r *http.Request) {
-	rend.HTML(w, http.StatusOK, "adminAnalyticsPage", nil)
+func (h *Handler) AdminDashHandler(w http.ResponseWriter, r *http.Request) {
+	// --- Your existing data fetching for core metrics ---
+	var totalUsers, totalTracks, featuredTracks, newTracksThisMonth int64
+	h.DB.Model(&models.User{}).Count(&totalUsers)
+	h.DB.Model(&models.Tracks{}).Count(&totalTracks)
+	h.DB.Model(&models.Tracks{}).Where("featured = ?", true).Count(&featuredTracks)
+	now := time.Now()
+	startOfMonth := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
+	h.DB.Model(&models.Tracks{}).Where("created_at >= ?", startOfMonth).Count(&newTracksThisMonth)
+
+	// --- Your existing data fetching for genre chart ---
+	type GenreCount struct {
+		Genre string
+		Count int
+	}
+	var genreCounts []GenreCount
+	h.DB.Model(&models.Tracks{}).Select("genre, count(*) as count").Group("genre").Order("count DESC").Limit(5).Find(&genreCounts)
+	var genreLabels []string
+	var genreData []int
+	for _, gc := range genreCounts {
+		genreLabels = append(genreLabels, gc.Genre)
+		genreData = append(genreData, gc.Count)
+	}
+	genreLabelsJSON, _ := json.Marshal(genreLabels)
+	genreDataJSON, _ := json.Marshal(genreData)
+
+	// --- Your existing data fetching for recent subscriptions ---
+	var recentSubscriptions []models.SessionIdResponse
+	h.DB.Order("created_at DESC").Limit(5).Find(&recentSubscriptions)
+
+	// --- CRITICAL ADDITION: Marshal recent subscriptions for JavaScript ---
+	recentSubsJSON, _ := json.Marshal(recentSubscriptions) // <-- ADD THIS LINE
+
+	// --- Assemble All Data ---
+	data := AnalyticsData{
+		TotalUsers:              totalUsers,
+		TotalTracks:             totalTracks,
+		FeaturedTracks:          featuredTracks,
+		NewTracksThisMonth:      newTracksThisMonth,
+		RecentSubscriptions:     recentSubscriptions, // You can keep this if needed elsewhere
+
+		// Cast the JSON strings to template.JS
+		GenreDistributionLabels: template.JS(genreLabelsJSON),
+		GenreDistributionData:   template.JS(genreDataJSON),
+		RecentSubscriptionsJS:   template.JS(recentSubsJSON), // <-- ADD THIS LINE
+	}
+
+	// Render the template
+	rend.HTML(w, http.StatusOK, "adminAnalyticsPage", data)
 }
 
 func (h *Handler) AdminCreateHandler(w http.ResponseWriter, r *http.Request) {

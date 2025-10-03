@@ -74,8 +74,9 @@
                 <button @click="setActiveGenre('all')" :class="{ 'active': activeGenre === 'all' }" class="filter-chip px-5 py-2 rounded-full font-medium text-sm">All</button>
                 <button @click="setActiveGenre('Gospel')" :class="{ 'active': activeGenre === 'Gospel' }" class="filter-chip px-5 py-2 rounded-full font-medium text-sm">Gospel</button>
                 <button @click="setActiveGenre('Bongo')" :class="{ 'active': activeGenre === 'Bongo' }" class="filter-chip px-5 py-2 rounded-full font-medium text-sm">Bongo</button>
-                <button @click="setActiveGenre('Afrobeat')" :class="{ 'active': activeGenre === 'Afrobeat' }" class="filter-chip px-5 py-2 rounded-full font-medium text-sm">Afrobeat</button>
                 <button @click="setActiveGenre('Somali')" :class="{ 'active': activeGenre === 'Somali' }" class="filter-chip px-5 py-2 rounded-full font-medium text-sm">Somali</button>
+                <button @click="setActiveGenre('Arabic')" :class="{ 'active': activeGenre === 'Arabic' }" class="filter-chip px-5 py-2 rounded-full font-medium text-sm">Arabic</button>
+                <button @click="setActiveGenre('Afrobeat')" :class="{ 'active': activeGenre === 'Afrobeat' }" class="filter-chip px-5 py-2 rounded-full font-medium text-sm">Afrobeat</button>
                 <button @click="setActiveGenre('Other')" :class="{ 'active': activeGenre === 'Other' }" class="filter-chip px-5 py-2 rounded-full font-medium text-sm">Other</button>
             </div>
         </div>
@@ -91,21 +92,13 @@
                  data-id="{{.ID}}" data-genre="{{.Genre}}" data-search="{{.TrackTitle}} {{.ArtistName}} {{.TrackCode}}">
                 
                 <div class="cover-art-wrapper rounded-xl mb-5">
-                    {{if .TrackAvatar}}
-                        <img src="/media/{{.TrackAvatar}}" alt="{{.TrackTitle}}" class="w-full h-full object-cover">
-                    {{else}}
-                        <div class="w-full h-full flex items-center justify-center bg-control">
-                            <i class='bx bxs-music text-6xl text-secondary'></i>
-                        </div>
-                    {{end}}
+                    {{if .TrackAvatar}}<img src="/media/{{.TrackAvatar}}" alt="{{.TrackTitle}}" class="w-full h-full object-cover">{{else}}<div class="w-full h-full flex items-center justify-center bg-control"><i class='bx bxs-music text-6xl text-secondary'></i></div>{{end}}
                     <div class="play-overlay" @click="playTrack({ id: {{.ID}}, title: `{{.TrackTitle}}`, artist: `{{.ArtistName}}`, code: `{{.TrackCode}}`, icon: `{{if .TrackAvatar}}/media/{{.TrackAvatar}}{{end}}`, src: `/{{.TrackPath}}` })">
                         <div class="play-btn"><i class='bx' :class="isPlaying && currentTrack.id === {{.ID}} ? 'bx-pause' : 'bx-play pl-1'"></i></div>
                     </div>
                 </div>
                 <div class="mb-4"><span class="text-xs font-bold uppercase tracking-wider" style="color: var(--secondary-glow);">{{.Genre}}</span><h3 class="text-xl font-bold truncate" style="color: var(--text-primary);">{{.TrackTitle}}</h3><p class="text-sm truncate" style="color: var(--text-secondary);">{{.ArtistName}}</p></div>
-                <div class="flex items-center justify-between pt-4 border-t border-color"><div class="font-mono text-sm font-bold p-2 rounded-lg" style="color: var(--text-primary);"></div>
-                <button @click="openSubModal({ title: `{{.TrackTitle}}`, artist: `{{.ArtistName}}`, code: `{{.TrackCode}}` })" class="bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 text-white p-2 rounded-full shadow-lg transition-all hover:scale-110 hover:shadow-violet-500/50" title="Subscribe"><i class='bx bx-dialpad-alt text-xl'></i>
-                </button></div>
+                <div class="flex items-center justify-between pt-4 border-t border-color"><div class="font-mono text-sm font-bold p-2 rounded-lg" style="color: var(--text-primary);"></div><button @click="openSubModal({ title: `{{.TrackTitle}}`, artist: `{{.ArtistName}}`, code: `{{.TrackCode}}` })" class="bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 text-white p-2 rounded-full shadow-lg transition-all hover:scale-110 hover:shadow-violet-500/50" title="Subscribe"><i class='bx bx-dialpad-alt text-xl'></i></button></div>
             </div>
             {{else}}
             <p class="text-center text-secondary col-span-full">No tracks available at the moment.</p>
@@ -115,98 +108,88 @@
         <div x-show="totalPages > 1" class="flex justify-center items-center mt-16 gap-2 flex-wrap" x-cloak>
             <button @click="goToPage(1)" :disabled="currentPage === 1" class="pagination-btn h-10 w-10 flex items-center justify-center rounded-full"><i class='bx bx-chevrons-left text-2xl'></i></button>
             <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 1" class="pagination-btn h-10 w-10 flex items-center justify-center rounded-full"><i class='bx bx-chevron-left text-2xl'></i></button>
-            <template x-for="page in pages" :key="page">
-                <button @click="goToPage(page)" :class="{ 'active': currentPage === page, 'hidden': typeof page === 'string'}" x-text="page" class="pagination-btn h-10 w-10 rounded-full font-semibold"></button>
-            </template>
+            <template x-for="page in pages" :key="page"><button @click="goToPage(page)" :class="{ 'active': currentPage === page, 'hidden': typeof page === 'string'}" x-text="page" class="pagination-btn h-10 w-10 rounded-full font-semibold"></button></template>
             <template x-for="page in pages" :key="page"><span x-show="typeof page === 'string'" x-text="page" class="h-10 w-10 flex items-center justify-center text-secondary"></span></template>
             <button @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages" class="pagination-btn h-10 w-10 flex items-center justify-center rounded-full"><i class='bx bx-chevron-right text-2xl'></i></button>
             <button @click="goToPage(totalPages)" :disabled="currentPage === totalPages" class="pagination-btn h-10 w-10 flex items-center justify-center rounded-full"><i class='bx bx-chevrons-right text-2xl'></i></button>
         </div>
     </main>
 
-    <footer class="glass border-t border-color py-8 text-center text-sm" style="color: var(--text-secondary);"><p>&copy; 2024 Lamahuraancomm. The heartbeat of Skiza.</p></footer>
+    <footer class="glass border-t border-color py-8 text-center text-sm" style="color: var(--text-secondary);"><p>&copy; 2025 Lamahuraancomm. The heartbeat of Skiza.</p></footer>
 
     <div x-show="isSubModalOpen" x-transition.opacity class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" x-cloak>
         <div @click.outside="isSubModalOpen = false" x-show="isSubModalOpen" x-transition class="glass rounded-xl shadow-2xl w-full max-w-md p-8">
             <div class="flex justify-between items-start mb-4">
-                <h3 class="text-2xl font-bold text-primary" ></h3>
+                <h3 class="text-2xl font-bold text-primary" x-text="subModalData.title"></h3>
                 <button @click="isSubModalOpen = false" class="text-secondary hover:text-primary text-2xl">&times;</button>
             </div>
-        <p class="text-secondary text-sm">Artist</p>
-        <br>
-        <p class="text-secondary -mt-4" x-text="subModalData.artist"></p>
-        <div class="text-center bg-control rounded-lg p-3 my-4">
-            <!-- <p class="text-secondary text-sm">Track</p> -->
-            <p class="text-2xl font-mono font-bold tracking-widest text-primary" x-text="subModalData.title"></p>
-        </div>
-    <form action="/" method="post">
-        <input type="hidden" name="skiza_code" :value="subModalData.code">
-        <div>
-            <label for="phone_number" class="text-sm font-medium text-secondary mb-1 block">Your Phone Number</label>
-            <input type="tel" name="phone_number" id="phone_number" placeholder="07XX XXX XXX" required class="search-input w-full py-3 px-4 rounded-lg text-lg">
-        </div>
-        <button type="submit" class="w-full mt-6 bg-gradient-to-r from-violet-600 to-cyan-600 text-white font-bold py-3 rounded-lg hover:scale-105 transition-transform">Subscribe Now</button>
-    </form>
-</div>
-</div>
-    
-    <div x-show="currentTrack.src" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="translate-y-0" x-transition:leave-end="translate-y-full" class="fixed bottom-0 left-0 right-0 z-50 glass border-t border-color" x-cloak>
-        <audio x-ref="audioPlayer" @timeupdate="updateProgress()" @loadedmetadata="onLoadedMetadata()" @ended="onEnded()"></audio>
-        <div class="container mx-auto px-4 py-3 grid grid-cols-3 items-center gap-4">
-            <div class="flex items-center gap-3">
-                <div class="w-14 h-14 rounded-md bg-control border border-color flex-shrink-0 flex items-center justify-center">
-                    <template x-if="currentTrack.icon"><img :src="currentTrack.icon" class="w-full h-full object-cover rounded-md"></template>
-                    <template x-if="!currentTrack.icon"><i class='bx bxs-music text-3xl text-secondary'></i></template>
+            <p class="text-secondary -mt-4 mb-2" x-text="subModalData.artist"></p>
+            <form action="/" method="post" @submit.prevent="handleSubscription($event)">
+                <input type="hidden" name="skiza_code" :value="subModalData.code">
+                <div>
+                    <label for="phone_number" class="text-sm font-medium text-secondary mb-1 block">Your Phone Number</label>
+                    <input type="tel" name="phone_number" id="phone_number" placeholder="07XX XXX XXX" required class="search-input w-full py-3 px-4 rounded-lg text-lg">
                 </div>
-                <div class="hidden md:block"><p class="font-bold text-primary truncate" x-text="currentTrack.title"></p><p class="text-sm text-secondary truncate" x-text="currentTrack.artist"></p></div>
-            </div>
-            <div class="flex flex-col items-center"><div class="flex items-center gap-4"><button @click="playPrev()" class="text-2xl text-secondary hover:text-primary transition-colors"><i class='bx bx-skip-previous'></i></button><button @click="togglePlayPause()" class="w-12 h-12 rounded-full bg-primary-glow text-white text-3xl flex items-center justify-center hover:scale-105 transition-transform"><i class='bx' :class="isPlaying ? 'bx-pause' : 'bx-play'"></i></button><button @click="playNext()" class="text-2xl text-secondary hover:text-primary transition-colors"><i class='bx bx-skip-next'></i></button></div><div class="w-full max-w-sm flex items-center gap-2 mt-2"><span class="text-xs text-secondary font-mono" x-text="currentTime"></span><input type="range" x-model="progress" @input="seekAudio($event.target.value)" class="w-full"><span class="text-xs text-secondary font-mono" x-text="duration"></span></div></div>
-            <div class="flex items-center justify-end gap-3"><div class="hidden md:flex items-center gap-2 w-32"><button @click="toggleMute()"><i class='bx text-2xl text-secondary hover:text-primary' :class="volume > 0 ? 'bxs-volume-full' : 'bxs-volume-mute'"></i></button><input type="range" min="0" max="1" step="0.01" x-model="volume" @input="setVolume($event.target.value)"></div><button @click="closePlayer()" class="text-2xl text-secondary hover:text-primary"><i class='bx bx-x'></i></button></div>
+                <button type="submit" :disabled="isSubmitting" class="w-full mt-6 bg-gradient-to-r from-violet-600 to-cyan-600 text-white font-bold py-3 rounded-lg hover:scale-105 transition-transform flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed">
+                    <span x-show="!isSubmitting">Subscribe Now</span>
+                    <span x-show="isSubmitting" class="flex items-center gap-2"><i class='bx bx-loader-alt bx-spin text-xl'></i> Processing...</span>
+                </button>
+            </form>
         </div>
     </div>
+    
+    <div x-show="currentTrack.src" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="translate-y-0" x-transition:leave-end="translate-y-full" class="fixed bottom-0 left-0 right-0 z-50 glass border-t border-color" x-cloak><audio x-ref="audioPlayer" @timeupdate="updateProgress()" @loadedmetadata="onLoadedMetadata()" @ended="onEnded()"></audio><div class="container mx-auto px-4 py-3 grid grid-cols-3 items-center gap-4"><div class="flex items-center gap-3"><div class="w-14 h-14 rounded-md bg-control border border-color flex-shrink-0 flex items-center justify-center"><template x-if="currentTrack.icon"><img :src="currentTrack.icon" class="w-full h-full object-cover rounded-md"></template><template x-if="!currentTrack.icon"><i class='bx bxs-music text-3xl text-secondary'></i></template></div><div class="hidden md:block"><p class="font-bold text-primary truncate" x-text="currentTrack.title"></p><p class="text-sm text-secondary truncate" x-text="currentTrack.artist"></p></div></div><div class="flex flex-col items-center"><div class="flex items-center gap-4"><button @click="playPrev()" class="text-2xl text-secondary hover:text-primary transition-colors"><i class='bx bx-skip-previous'></i></button><button @click="togglePlayPause()" class="w-12 h-12 rounded-full bg-primary-glow text-white text-3xl flex items-center justify-center hover:scale-105 transition-transform"><i class='bx' :class="isPlaying ? 'bx-pause' : 'bx-play'"></i></button><button @click="playNext()" class="text-2xl text-secondary hover:text-primary transition-colors"><i class='bx bx-skip-next'></i></button></div><div class="w-full max-w-sm flex items-center gap-2 mt-2"><span class="text-xs text-secondary font-mono" x-text="currentTime"></span><input type="range" x-model="progress" @input="seekAudio($event.target.value)" class="w-full"><span class="text-xs text-secondary font-mono" x-text="duration"></span></div></div><div class="flex items-center justify-end gap-3"><div class="hidden md:flex items-center gap-2 w-32"><button @click="toggleMute()"><i class='bx text-2xl text-secondary hover:text-primary' :class="volume > 0 ? 'bxs-volume-full' : 'bxs-volume-mute'"></i></button><input type="range" min="0" max="1" step="0.01" x-model="volume" @input="setVolume($event.target.value)"></div><button @click="closePlayer()" class="text-2xl text-secondary hover:text-primary"><i class='bx bx-x'></i></button></div></div></div>
 
     <script>
-        if (window.history.replaceState) {
-            window.history.replaceState(null, null, window.location.href);
-        }
         function pageController() {
             return {
-                theme: 'dark', isSubModalOpen: false, subModalData: {}, searchQuery: '', activeGenre: 'all', currentPage: 1, itemsPerPage: 8,
+                theme: 'dark', isSubModalOpen: false, subModalData: {}, isSubmitting: false, searchQuery: '', activeGenre: 'all', currentPage: 1, itemsPerPage: 8,
                 audioPlayer: null, currentTrack: { id: null, src: null }, isPlaying: false, progress: 0, volume: 0.75, duration: '0:00', currentTime: '0:00',
                 
-                init() {
-                    this.setTheme(localStorage.getItem('theme') || 'dark');
-                    this.$nextTick(() => {
-                        this.audioPlayer = this.$refs.audioPlayer;
-                        this.audioPlayer.volume = this.volume;
-                        this.initTilt();
-                    });
-                },
+                init() { this.setTheme(localStorage.getItem('theme') || 'dark'); this.$nextTick(() => { this.audioPlayer = this.$refs.audioPlayer; this.audioPlayer.volume = this.volume; this.initTilt(); }); },
                 setTheme(t) { this.theme = t; document.documentElement.setAttribute('data-theme', t); localStorage.setItem('theme', t); },
                 toggleTheme() { this.setTheme(this.theme === 'dark' ? 'light' : 'dark'); },
+                
+                async handleSubscription(event) {
+                    this.isSubmitting = true;
+                    const form = event.target;
+                    const formData = new FormData(form);
+                    const timeout = 15000; // 15 seconds
+                    
+                    try {
+                        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Request timed out.')), timeout));
+                        const fetchPromise = fetch(form.action, { method: 'POST', body: formData, headers: { 'Accept': 'application/json' } });
+                        
+                        const response = await Promise.race([fetchPromise, timeoutPromise]);
+                        
+                        if (!response.ok) throw new Error(`Server responded with status: ${response.status}`);
+                        
+                        const data = await response.json();
+                        
+                        if (data && data.RedirectURL) {
+                            window.location.href = data.RedirectURL;
+                        } else {
+                            throw new Error('Invalid response from server.');
+                        }
+                    } catch (error) {
+                        console.error('Subscription failed:', error);
+                        alert(`Subscription failed: ${error.message}`);
+                    } finally {
+                        this.isSubmitting = false;
+                    }
+                },
                 
                 playTrack(trackData) {
                     if (this.currentTrack.id === trackData.id) { this.togglePlayPause(); } 
                     else {
-                        this.currentTrack = trackData;
-                        this.audioPlayer.src = this.currentTrack.src;
-                        this.audioPlayer.play().then(() => this.isPlaying = true).catch(e => { console.error("Audio error:", e); alert("Audio preview for this track could not be loaded."); });
+                        this.currentTrack = trackData; this.audioPlayer.src = this.currentTrack.src;
+                        this.audioPlayer.play().then(() => this.isPlaying = true).catch(e => console.error("Audio error:", e));
                     }
                 },
                 togglePlayPause() { if (!this.currentTrack.src) return; this.audioPlayer.paused ? this.audioPlayer.play().then(()=>this.isPlaying = true) : (this.audioPlayer.pause(), this.isPlaying = false); },
                 playNext() { const list = this.filteredItems; const idx = list.findIndex(el => el.dataset.id == this.currentTrack.id); const nextItem = list[idx + 1] || list[0]; if (nextItem) { this.playTrack(this.getTrackDataFromEl(nextItem)); }},
                 playPrev() { const list = this.filteredItems; const idx = list.findIndex(el => el.dataset.id == this.currentTrack.id); const prevItem = list[idx - 1] || list[list.length - 1]; if (prevItem) { this.playTrack(this.getTrackDataFromEl(prevItem)); }},
-                getTrackDataFromEl(el) {
-                    const iconEl = el.querySelector('img');
-                    return {
-                        id: el.dataset.id,
-                        title: el.querySelector('h3').textContent,
-                        artist: el.querySelector('p').textContent,
-                        code: el.querySelector('.font-mono').textContent.replace('CODE: ',''),
-                        icon: iconEl ? iconEl.src : '',
-                        src: el.querySelector('.play-overlay').nextElementSibling.src
-                    };
-                },
+                getTrackDataFromEl(el) { const iconEl = el.querySelector('img'); return { id: el.dataset.id, title: el.querySelector('h3').textContent, artist: el.querySelector('p').textContent, code: el.querySelector('.font-mono').textContent.replace('CODE: ',''), icon: iconEl ? iconEl.src : '', src: el.querySelector('.play-overlay').nextElementSibling.src }; },
                 updateProgress() { this.progress = (this.audioPlayer.currentTime / this.audioPlayer.duration) * 100 || 0; this.currentTime = this.formatTime(this.audioPlayer.currentTime); },
                 onLoadedMetadata() { this.duration = this.formatTime(this.audioPlayer.duration); },
                 onEnded() { this.isPlaying = false; this.playNext(); },
@@ -215,14 +198,13 @@
                 toggleMute() { this.volume = this.volume > 0 ? 0 : 0.75; this.setVolume(this.volume); },
                 closePlayer() { this.audioPlayer.pause(); this.isPlaying = false; this.currentTrack = { id: null, src: null }; },
                 formatTime(s) { if(isNaN(s)) return '0:00'; const m=Math.floor(s/60); const sc=Math.floor(s%60).toString().padStart(2,'0'); return `${m}:${sc}`; },
-
                 get filteredItems() { const q = this.searchQuery.toLowerCase(); return Array.from(document.querySelectorAll('.track-card')).filter(c => (this.activeGenre === 'all' || c.dataset.genre === this.activeGenre) && c.dataset.search.toLowerCase().includes(q)); },
                 get totalPages() { return Math.ceil(this.filteredItems.length / this.itemsPerPage); },
                 get pages() {
                     const total = this.totalPages; const current = this.currentPage;
-                    if (total <= 7) { return Array.from({ length: total }, (_, i) => i + 1); }
-                    if (current <= 4) { return [1, 2, 3, 4, 5, '...', total]; }
-                    if (current > total - 4) { return [1, '...', total - 4, total - 3, total - 2, total - 1, total]; }
+                    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+                    if (current <= 4) return [1, 2, 3, 4, 5, '...', total];
+                    if (current > total - 4) return [1, '...', total - 4, total - 3, total - 2, total - 1, total];
                     return [1, '...', current - 1, current, current + 1, '...', total];
                 },
                 isItemVisible(el) { const i = this.filteredItems.indexOf(el); const s = (this.currentPage - 1) * this.itemsPerPage; return i >= s && i < s + this.itemsPerPage; },
@@ -230,7 +212,6 @@
                 setActiveGenre(g) { this.activeGenre = g; this.applyFilters(); },
                 goToPage(p) { if (typeof p === 'number' && p > 0 && p <= this.totalPages) { this.currentPage = p; document.getElementById('page-header').scrollIntoView({ behavior: 'smooth' }); } },
                 openSubModal(data) { this.subModalData = data; this.isSubModalOpen = true; },
-                
                 initTilt() { document.querySelectorAll('.tilt-element').forEach(el => { el.addEventListener('mousemove', e => { const r = el.getBoundingClientRect(); const tX=(e.clientX-(r.left+r.width/2))/(r.width/2); const tY=(e.clientY-(r.top+r.height/2))/(r.height/2); el.style.transform = `perspective(1000px) rotateX(${tY*8}deg) rotateY(${-tX*8}deg) scale3d(1.02, 1.02, 1.02)`; }); el.addEventListener('mouseleave', () => { el.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)'; }); }); }
             }
         }
